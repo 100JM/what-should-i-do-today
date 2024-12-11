@@ -8,3 +8,40 @@ body {
   margin: 0;
   padding: 0;
 }
+
+.near-recommend::after {
+  position: absolute;
+  left: 125px;
+  right: 0px;
+  top: 12px;
+  height: 1px;
+  background: #e0e0e0;
+  content: "";
+}
+
+.custom-scroll-container::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scroll-container::-webkit-scrollbar-track {
+  background: #f0f0f0;
+  border-radius: 8px;
+}
+
+.custom-scroll-container::-webkit-scrollbar-thumb {
+  background: #ccc;
+  border-radius: 10px;
+  border: 1px solid #f0f0f0;
+}
+
+.custom-scroll-container::-webkit-scrollbar-button {
+  display: none;
+}
+
+.custom-scroll-container {
+  padding-right: 4px
+}
+
+.custom-scroll-container>div:not(:last-child) {
+  margin-bottom: 24px;
+}
