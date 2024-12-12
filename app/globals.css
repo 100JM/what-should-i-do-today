@@ -42,6 +42,13 @@ body {
   padding-right: 4px
 }
 
-.custom-scroll-container>div:not(:last-child) {
-  margin-bottom: 24px;
+.customOverlay::after {
+  border-bottom: 0px solid transparent;
+  border-left: 10px solid transparent;
+  border-right: 10px solid transparent;
+  border-top: 10px solid #FEFEFE;
+  content: "";
+  position: absolute;
+  bottom: -10px;
+  left: calc(50% - 10px);
 }

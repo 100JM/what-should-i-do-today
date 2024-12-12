@@ -4,14 +4,17 @@ import { useEffect, useState } from "react";
 import axios from "axios";
 
 import useMapData from "../store/useMapData";
+import usePlaceData from "../store/usePlaceData";
 import CategoryButton from "./CategoryButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faMagnifyingGlass, faAngleLeft } from "@fortawesome/free-solid-svg-icons"
+import { faMagnifyingGlass, faAngleLeft, faMapLocationDot } from "@fortawesome/free-solid-svg-icons"
+import Skeleton from '@mui/material/Skeleton';
 
 const SearchForm = () => {
-    const [showSearchForm, setShowSearchForm] = useState<boolean>(false);
+    const [showSearchForm, setShowSearchForm] = useState<boolean>(true);
     const [regionName, setRegionName] = useState<string>('');
-    const { mapCenter } = useMapData();
+    const { mapCenter, setMapCenter, setZoomLevel } = useMapData();
+    const { categoryPlaceList } = usePlaceData();
 
     const fetchAddress = async () => {
         try {
@@ -24,10 +27,15 @@ const SearchForm = () => {
         }
     };
 
+    const handleClickPlace = (center:{lat :number, lng: number}) => {
+        setMapCenter(center);
+        setZoomLevel(1);
+    };
+
     useEffect(() => {
         fetchAddress();
     }, [mapCenter]);
-
+    console.log(categoryPlaceList);
     return (
         <>
             {!showSearchForm &&
@@ -44,24 +52,53 @@ const SearchForm = () => {
                 >
                     <FontAwesomeIcon icon={faAngleLeft} />
                 </button>
-                <div className="w-full h-full px-4 mt-4">
+                <div className="w-full h-full p-4 flex flex-col">
                     <div className="w-full py-2 px-4 border-2 border-[#2391ff] rounded-3xl">
                         <FontAwesomeIcon icon={faMagnifyingGlass} className="text-[#2391ff]" />
-                        <input className="w-[90%] py-1 px-2 outline-none" type="text" placeholder="카테고리, 키워드로 검색" />
+                        <input className="w-[90%] p-1 outline-none" type="text" placeholder="카테고리, 키워드로 검색" />
                     </div>
                     <div className="w-[90%] mt-4 flex flex-wrap gap-3">
                         <CategoryButton />
                     </div>
-                    <div className="mt-4 text-lg font-semibold">
-                        <i className="ri-map-pin-2-line pr-1"></i>
-                        <span>{regionName}</span>
-                    </div>
+                    {regionName ?
+                        <div className="mt-4 text-lg font-semibold">
+                            <i className="ri-map-pin-2-line pr-1"></i>
+                            <span>{regionName}</span>
+                        </div>
+                        :
+                        <Skeleton variant="text" sx={{ marginTop: "16px", borderRadius: "8px", fontSize: "1.25rem" }} />
+                    }
                     <div className="mt-4 relative">
                         <span className="near-recommend">주변 추천 리스트</span>
                     </div>
-                    <div className="mt-4 h-[calc(100%-290px)] w-full overflow-y-auto custom-scroll-container">
-                            <div className="w-full h-40 shadow-md shadow-gray-400 border rounded-xl"></div>
-                    </div>
+                    {categoryPlaceList.length > 0 ?
+                        <div className="mt-4 w-full overflow-y-auto custom-scroll-container grid grid-cols-1 gap-4">
+                            {categoryPlaceList.map((cp) => {
+                                return (
+                                    <div key={cp.id} className="border rounded-xl p-4 cursor-pointer hover:border-[#2391ff]" onClick={() => handleClickPlace({lat: Number(cp.y), lng: Number(cp.x)})}>
+                                        <p className="text-xs mb-2 text-[#868e96]">{cp.category_name}</p>
+                                        <p>
+                                            {cp.place_name}
+                                            <small>({cp.category_group_name})</small>
+                                        </p>
+                                        <p className="text-sm">{cp.address_name}</p>
+                                        <p className="mt-2 text-sm">
+                                            <FontAwesomeIcon icon={faMapLocationDot} className="text-[#2391ff] text-lg mr-2" />
+                                            현재 위치에서 {cp.distance}m
+                                        </p>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                        :
+                        <div className="mt-4 w-full overflow-y-hidden custom-scroll-container grid grid-cols-1 gap-4">
+                            {Array.from({ length: 15 }, (_, i) => {
+                                return (
+                                    <Skeleton key={i} variant="rectangular" sx={{ borderRadius: "12px", paddingRight: "4px" }} height={120} />
+                                )
+                            })}
+                        </div>
+                    }
                 </div>
             </div>
         </>
