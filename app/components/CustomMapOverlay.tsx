@@ -1,11 +1,27 @@
 import { useState } from 'react';
 
 import { CustomOverlayMap } from 'react-kakao-maps-sdk'
+import { categoryPlace } from '@/types/categoryData';
+
+import useDialog from '../store/useDialog';
 import usePlaceData from '../store/usePlaceData';
+import useMapData from '../store/useMapData';
 
 const CustomMapOverlay = () => {
-    const { categoryPlaceList, selectedPlace, setSelectedPlace } = usePlaceData();
-    const [showPlaceInfo, setShowPlaceInfo] = useState<boolean>(false);
+    const { setShowPlaceInfo } = useDialog();
+    const { setZoomLevel, setMapCenter } = useMapData();
+    const { categoryPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef } = usePlaceData();
+
+    const handleClickOverlay = (place: categoryPlace) => {
+        setMapCenter({lat: Number(place.y), lng: Number(place.x)});
+        setZoomLevel(1);
+        setSelectedPlace(place);
+        setShowPlaceInfo(true);
+
+        if (selectedPlaceRef[place.id]) {
+            selectedPlaceRef[place.id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
 
     return (
         <>
@@ -21,8 +37,8 @@ const CustomMapOverlay = () => {
                             xAnchor={0.5}
                             yAnchor={1.5}
                         >
-                            <div className="customOverlay bg-white p-3 rounded-lg shadow cursor-pointer hover:shadow-md">
-                                <p className={`text-xs text-[#3788d8] font-semibold ${p.id === selectedPlace.id ? 'underline underline-offset-4' : ''}`}>
+                            <div className="customOverlay bg-white p-3 rounded-lg shadow cursor-pointer hover:shadow-md" onClick={() => handleClickOverlay(p)}>
+                                <p className={`text-xs text-[#3788d8] font-semibold ${p.id === selectedPlace.id ? 'underline underline-offset-4' : ''} hover:underline underline-offset-4`}>
                                     {p.place_name}
                                     {/* <i className="ri-external-link-line"></i> */}
                                 </p>

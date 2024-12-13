@@ -14,13 +14,13 @@ import Skeleton from '@mui/material/Skeleton';
 const SearchForm = () => {
     const [showSearchForm, setShowSearchForm] = useState<boolean>(true);
     const [regionName, setRegionName] = useState<string>('');
-    const { mapCenter, setMapCenter, setZoomLevel } = useMapData();
-    const { categoryPlaceList, selectedPlace, setSelectedPlace } = usePlaceData();
+    const { setZoomLevel, myLocation, setMapCenter } = useMapData();
+    const { categoryPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef, setSelectedPlaceRef } = usePlaceData();
 
     const fetchAddress = async () => {
         try {
-            if (mapCenter.lat && mapCenter.lng) {
-                const response = await axios.get(`api/kakao-georegion-api?x=${mapCenter.lng}&y=${mapCenter.lat}`);
+            if (myLocation.lat && myLocation.lng) {
+                const response = await axios.get(`api/kakao-georegion-api?x=${myLocation.lng}&y=${myLocation.lat}`);
                 setRegionName(response.data.address_name);
             }
         } catch (error) {
@@ -29,14 +29,18 @@ const SearchForm = () => {
     };
 
     const handleClickPlace = (place: categoryPlace) => {
-        setMapCenter({lat: Number(place.y), lng: Number(place.x)});
+        setMapCenter({ lat: Number(place.y), lng: Number(place.x) });
         setZoomLevel(1);
         setSelectedPlace(place);
+
+        if (selectedPlaceRef[place.id]) {
+            selectedPlaceRef[place.id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
     };
 
     useEffect(() => {
         fetchAddress();
-    }, [mapCenter]);
+    }, [myLocation]);
     console.log(categoryPlaceList);
     return (
         <>
@@ -77,7 +81,16 @@ const SearchForm = () => {
                         <div className="mt-4 w-full overflow-y-auto custom-scroll-container grid grid-cols-1 gap-4">
                             {categoryPlaceList.map((cp) => {
                                 return (
-                                    <div key={cp.id} className={`border rounded-xl p-4 cursor-pointer hover:border-[#2391ff] ${cp.id === selectedPlace.id ? 'border-[#2391ff]' : ''}`} onClick={() => handleClickPlace(cp)}>
+                                    <div
+                                        key={cp.id}
+                                        className={`border rounded-xl p-4 cursor-pointer hover:border-[#2391ff] ${cp.id === selectedPlace.id ? 'border-[#2391ff]' : ''}`}
+                                        onClick={() => handleClickPlace(cp)}
+                                        ref={(el) => {
+                                            if (el && selectedPlaceRef[cp.id] !== el) {
+                                                setSelectedPlaceRef(cp.id, el);
+                                            }
+                                        }}
+                                    >
                                         <p className="text-xs mb-2 text-[#868e96]">{cp.category_name}</p>
                                         <p>
                                             {cp.place_name}
