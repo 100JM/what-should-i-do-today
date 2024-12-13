@@ -10,7 +10,7 @@ import CustomMapOverlay from './CustomMapOverlay';
 
 const KakaoMap = () => {
 
-    const { mapCenter, setMapCenter, zoomLevel } = useMapData();
+    const { mapCenter, setMapCenter, zoomLevel, setZoomLevel } = useMapData();
     const { setCategoryPlaceList } = usePlaceData();
 
     const { loading, error } = useKakaoLoader({
@@ -53,6 +53,10 @@ const KakaoMap = () => {
             style={{ height: '100%' }}
             level={Number(zoomLevel)}
             draggable={true}
+            onZoomChanged={(map) => {
+                // 실제 줌 레벨을 상태와 동기화=
+                setZoomLevel(map.getLevel());
+            }}
         >
             <MapMarker position={{ lat: (mapCenter.lat ? mapCenter.lat : 37.5665), lng: (mapCenter.lng ? mapCenter.lng : 126.9780) }} />
             <CustomMapOverlay />

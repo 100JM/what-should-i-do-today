@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
 
+import { categoryPlace } from "@/types/categoryData";
 import useMapData from "../store/useMapData";
 import usePlaceData from "../store/usePlaceData";
 import CategoryButton from "./CategoryButton";
@@ -14,7 +15,7 @@ const SearchForm = () => {
     const [showSearchForm, setShowSearchForm] = useState<boolean>(true);
     const [regionName, setRegionName] = useState<string>('');
     const { mapCenter, setMapCenter, setZoomLevel } = useMapData();
-    const { categoryPlaceList } = usePlaceData();
+    const { categoryPlaceList, selectedPlace, setSelectedPlace } = usePlaceData();
 
     const fetchAddress = async () => {
         try {
@@ -27,9 +28,10 @@ const SearchForm = () => {
         }
     };
 
-    const handleClickPlace = (center:{lat :number, lng: number}) => {
-        setMapCenter(center);
+    const handleClickPlace = (place: categoryPlace) => {
+        setMapCenter({lat: Number(place.y), lng: Number(place.x)});
         setZoomLevel(1);
+        setSelectedPlace(place);
     };
 
     useEffect(() => {
@@ -75,7 +77,7 @@ const SearchForm = () => {
                         <div className="mt-4 w-full overflow-y-auto custom-scroll-container grid grid-cols-1 gap-4">
                             {categoryPlaceList.map((cp) => {
                                 return (
-                                    <div key={cp.id} className="border rounded-xl p-4 cursor-pointer hover:border-[#2391ff]" onClick={() => handleClickPlace({lat: Number(cp.y), lng: Number(cp.x)})}>
+                                    <div key={cp.id} className={`border rounded-xl p-4 cursor-pointer hover:border-[#2391ff] ${cp.id === selectedPlace.id ? 'border-[#2391ff]' : ''}`} onClick={() => handleClickPlace(cp)}>
                                         <p className="text-xs mb-2 text-[#868e96]">{cp.category_name}</p>
                                         <p>
                                             {cp.place_name}
