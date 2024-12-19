@@ -40,7 +40,6 @@ const CustomMapOverlay = () => {
                             <div className="customOverlay bg-white p-3 rounded-lg shadow cursor-pointer hover:shadow-md" onClick={() => handleClickOverlay(p)}>
                                 <p className={`text-xs text-[#3788d8] font-semibold ${p.id === selectedPlace.id ? 'underline underline-offset-4' : ''} hover:underline underline-offset-4`}>
                                     {p.place_name}
-                                    {/* <i className="ri-external-link-line"></i> */}
                                 </p>
                             </div>
                         </CustomOverlayMap>

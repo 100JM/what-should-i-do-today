@@ -51,7 +51,7 @@ const SearchForm = () => {
                     </button>
                 </div>
             }
-            <div className={`top-0 left-0 z-50 fixed bg-white w-1/6 h-full shadow-2xl rounded-tr-2xl rounded-br-2xl transform transition-transform duration-500 ${showSearchForm ? "translate-x-0" : "-translate-x-full"}`}>
+            <div className={`top-0 left-0 z-50 fixed bg-white w-[420px] h-full shadow-2xl rounded-tr-2xl rounded-br-2xl transform transition-transform duration-500 ${showSearchForm ? "translate-x-0" : "-translate-x-full"}`}>
                 <button
                     className={`absolute top-[calc(50%-40px)] left-full bg-white h-10 w-7 shadow-2xl rounded-tr-lg rounded-br-lg border transform transition-opacity duration-500 ${showSearchForm ? "opacity-100" : "opacity-0"}`}
                     onClick={() => setShowSearchForm(false)}
