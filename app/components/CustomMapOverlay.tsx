@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import { CustomOverlayMap } from 'react-kakao-maps-sdk'
 import { categoryPlace } from '@/types/categoryData';
 
@@ -35,12 +33,18 @@ const CustomMapOverlay = () => {
                                 lng: Number(p.x),
                             }}
                             xAnchor={0.5}
-                            yAnchor={1.5}
+                            yAnchor={0.8}
+                            zIndex={selectedPlace.id === p.id ? 10 : 1}
                         >
-                            <div className="customOverlay bg-white p-3 rounded-lg shadow cursor-pointer hover:shadow-md" onClick={() => handleClickOverlay(p)}>
-                                <p className={`text-xs text-[#3788d8] font-semibold ${p.id === selectedPlace.id ? 'underline underline-offset-4' : ''} hover:underline underline-offset-4`}>
-                                    {p.place_name}
-                                </p>
+                            <div className="cursor-pointer custom-overlay-title" onClick={() => handleClickOverlay(p)}>
+                                <i className="ri-map-pin-2-fill text-red-500 text-xl"></i>
+                                <div>
+                                    {
+                                        p.place_name.split(' ').map((line, index) => (
+                                            <p key={index}>{line}</p>
+                                        ))
+                                    }
+                                </div>
                             </div>
                         </CustomOverlayMap>
                     )
