@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import axios from "axios";
 
 import { categoryPlace } from "@/types/categoryData";
@@ -14,8 +14,16 @@ import Skeleton from '@mui/material/Skeleton';
 const SearchForm = () => {
     const [showSearchForm, setShowSearchForm] = useState<boolean>(true);
     const [regionName, setRegionName] = useState<string>('');
-    const { setZoomLevel, myLocation, setMapCenter } = useMapData();
-    const { categoryPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef, setSelectedPlaceRef } = usePlaceData();
+    const [clickedButton, setClickedButton] = useState<string>('');
+
+    const { setZoomLevel, myLocation, setMapCenter, mapObject } = useMapData();
+    const { categoryPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef, setSelectedPlaceRef, listTitle, setListTitle, resetSelectedPlaceRef, resetSelectedPlace, setCategoryPlaceList } = usePlaceData();
+
+    const searchInputRef = useRef<HTMLInputElement>(null);
+
+    const handleClickCateBtn = (code: string) => {
+        setClickedButton(code);
+    };
 
     const fetchAddress = async () => {
         try {
@@ -35,6 +43,25 @@ const SearchForm = () => {
 
         if (selectedPlaceRef[place.id]) {
             selectedPlaceRef[place.id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
+
+    const handleSearchKeyword = async () => {
+        resetSelectedPlace();
+        resetSelectedPlaceRef();
+        setClickedButton('');
+
+        try {
+            if (searchInputRef.current?.value) {
+    
+                const keywordResponse = await axios.get(`api/kakao-keyword-api?x=${myLocation.lng}&y=${myLocation.lat}&keyword=${searchInputRef.current.value}`);
+                setCategoryPlaceList(keywordResponse.data);
+                setListTitle(`${searchInputRef.current.value} 검색 결과`);
+                setZoomLevel(4);
+                setMapCenter({ lat: Number(keywordResponse.data[0].y), lng: Number(keywordResponse.data[0].x) });
+            }
+        } catch (error) {
+            console.log('fetchKeywordSearch Error:', error);
         }
     };
 
@@ -60,11 +87,21 @@ const SearchForm = () => {
                 </button>
                 <div className="w-full h-full p-4 flex flex-col">
                     <div className="w-full py-2 px-4 border-2 border-[#2391ff] rounded-3xl">
-                        <FontAwesomeIcon icon={faMagnifyingGlass} className="text-[#2391ff]" />
-                        <input className="w-[90%] p-1 outline-none" type="text" placeholder="카테고리, 키워드로 검색" />
+                        <FontAwesomeIcon icon={faMagnifyingGlass} className="text-[#2391ff] cursor-pointer" onClick={handleSearchKeyword} />
+                        <input 
+                            className="w-[90%] p-1 outline-none"
+                            type="text"
+                            placeholder="카테고리, 키워드로 검색"
+                            ref={searchInputRef}
+                            onKeyUp={(key) => {
+                                if (key.key === 'Enter') {
+                                    handleSearchKeyword();
+                                }
+                            }} 
+                        />
                     </div>
                     <div className="w-[90%] mt-4 flex flex-wrap gap-3">
-                        <CategoryButton />
+                        <CategoryButton clickedButton={clickedButton} handleClickCateBtn={handleClickCateBtn} searchInputRef={searchInputRef} />
                     </div>
                     {regionName ?
                         <div className="mt-4 text-lg font-semibold">
@@ -75,7 +112,11 @@ const SearchForm = () => {
                         <Skeleton variant="text" sx={{ marginTop: "16px", borderRadius: "8px", fontSize: "1.25rem" }} />
                     }
                     <div className="mt-4 relative">
-                        <span className="near-recommend">주변 추천 리스트</span>
+                        {listTitle ?
+                            <span className="near-recommend">{listTitle}</span>
+                            :
+                            <Skeleton variant="rectangular" sx={{ borderRadius: "8px" }} height={24} />
+                        }
                     </div>
                     {categoryPlaceList.length > 0 ?
                         <div className="mt-4 w-full overflow-y-auto custom-scroll-container grid grid-cols-1 gap-4">
@@ -94,7 +135,7 @@ const SearchForm = () => {
                                         <p className="text-xs mb-2 text-[#868e96]">{cp.category_name}</p>
                                         <p>
                                             {cp.place_name}
-                                            <small>({cp.category_group_name})</small>
+                                            {cp.category_group_name && <small>({cp.category_group_name})</small>}
                                         </p>
                                         <p className="text-sm">{cp.address_name}</p>
                                         <p className="mt-2 text-sm">

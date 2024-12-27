@@ -13,6 +13,8 @@ interface useMapInterface {
         lng: number | undefined
     };
     setMyLocation: (center: {lat: number, lng:number}) => void;
+    mapObject: kakao.maps.Map | undefined;
+    setMapObject: (map: kakao.maps.Map) => void;
 }
 
 const useMapData = create<useMapInterface>((set) => ({
@@ -28,6 +30,8 @@ const useMapData = create<useMapInterface>((set) => ({
         lng: undefined
     },
     setMyLocation: (center: {lat: number, lng:number}) => set({ myLocation: center }),
+    mapObject: undefined,
+    setMapObject: (map: kakao.maps.Map) => set({ mapObject: map }),
 }));
 
 export default useMapData;

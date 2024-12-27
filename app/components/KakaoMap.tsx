@@ -13,8 +13,8 @@ import PlaceInfoDialog from './PlaceInfoDialog';
 
 const KakaoMap = () => {
     const { showPlaceInfo } = useDialog();
-    const { mapCenter, setMapCenter, zoomLevel, setZoomLevel, myLocation, setMyLocation } = useMapData();
-    const { setCategoryPlaceList, resetSelectedPlaceRef } = usePlaceData();
+    const { mapCenter, setMapCenter, zoomLevel, setZoomLevel, myLocation, setMyLocation, mapObject, setMapObject } = useMapData();
+    const { setCategoryPlaceList, resetSelectedPlaceRef, setListTitle } = usePlaceData();
 
     const { loading, error } = useKakaoLoader({
         appkey: process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY || '',
@@ -43,6 +43,7 @@ const KakaoMap = () => {
                 setMyLocation({ lat: geo.coords.latitude, lng: geo.coords.longitude });
                 setMapCenter({ lat: geo.coords.latitude, lng: geo.coords.longitude });
                 fetchCategory(geo.coords.longitude, geo.coords.latitude);
+                setListTitle('주변 추천 리스트');
             },
                 (error) => {
                     console.error("Geolocation error:", error);
@@ -61,8 +62,15 @@ const KakaoMap = () => {
                 level={Number(zoomLevel)}
                 draggable={true}
                 onZoomChanged={(map) => {
-                    // 실제 줌 레벨을 상태와 동기화=
-                    setZoomLevel(map.getLevel());
+                    const newZoomLevel = map.getLevel();
+                    if (newZoomLevel !== zoomLevel) {
+                        setZoomLevel(newZoomLevel);
+                    }
+                }}
+                onCreate={(map) => {
+                    if (!mapObject) {
+                        setMapObject(map);
+                    }
                 }}
             >
                 <MapMarker position={{ lat: (myLocation.lat ? myLocation.lat : 37.5665), lng: (myLocation.lng ? myLocation.lng : 126.9780) }} />

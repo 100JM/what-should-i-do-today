@@ -1,6 +1,5 @@
 import { create } from "zustand";
 import { categoryPlace } from "@/types/categoryData";
-import { useRef } from "react";
 
 interface usePlaceDataInterface {
     categoryPlaceList: Array<categoryPlace>;
@@ -11,6 +10,8 @@ interface usePlaceDataInterface {
     selectedPlaceRef: Record<string, HTMLDivElement | null>;
     setSelectedPlaceRef: (key: string, ref: HTMLDivElement | null) => void;
     resetSelectedPlaceRef: () => void;
+    listTitle: string;
+    setListTitle: (title: string) => void;
 }
 
 const usePlaceData = create<usePlaceDataInterface>((set) => ({
@@ -48,6 +49,8 @@ const usePlaceData = create<usePlaceDataInterface>((set) => ({
     selectedPlaceRef: {},
     setSelectedPlaceRef: (key: string, ref: HTMLDivElement | null) => set((state) => ({ selectedPlaceRef: { ...state.selectedPlaceRef, [key]: ref } })),
     resetSelectedPlaceRef: () => set({ selectedPlaceRef: {} }),
+    listTitle: '',
+    setListTitle: (title: string) => set({ listTitle: title }),
 }));
 
 export default usePlaceData;
