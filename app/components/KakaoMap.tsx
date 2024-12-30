@@ -37,6 +37,27 @@ const KakaoMap = () => {
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error loading map: {error.message}</div>;
 
+    const handleClickLocationBtn = () => {
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition((geo) => {
+                setMyLocation({ lat: geo.coords.latitude, lng: geo.coords.longitude });
+                setMapCenter({ lat: geo.coords.latitude, lng: geo.coords.longitude });
+
+                if (mapObject) {
+                    mapObject.setCenter(new kakao.maps.LatLng(geo.coords.latitude, geo.coords.longitude));
+                }
+
+                setZoomLevel(5);
+            },
+                (error) => {
+                    console.error("Geolocation error:", error);
+                },
+                {
+                    enableHighAccuracy: true
+                })
+        }
+    };
+
     useEffect(() => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((geo) => {
@@ -75,6 +96,12 @@ const KakaoMap = () => {
             >
                 <MapMarker position={{ lat: (myLocation.lat ? myLocation.lat : 37.5665), lng: (myLocation.lng ? myLocation.lng : 126.9780) }} />
                 <CustomMapOverlay />
+                <button 
+                    className="absolute bottom-6 right-6 z-[11] bg-white w-9 h-9 rounded border shadow-md text-[#2391ff] text-lg flex justify-center items-center"
+                    onClick={handleClickLocationBtn}
+                >
+                    <i className="ri-crosshair-2-line"></i>
+                </button>
             </Map>
             {showPlaceInfo && <PlaceInfoDialog />}
         </>

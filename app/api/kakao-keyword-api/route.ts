@@ -17,9 +17,28 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
             Authorization: `KakaoAK ${process.env.NEXT_KAKAO_REST_API_KEY}`
         }
     });
-    console.log(response.data.meta.same_name); //selected_region를 좌표로 변환?
+
+    const selectedRegion = response.data.meta.same_name.selected_region;
+
+    if (selectedRegion) {
+        const searchAddressUrl = `https://dapi.kakao.com/v2/local/search/address.json`;
+
+        const searchAddressResponse = await axios.get(searchAddressUrl, {
+            headers: {
+                Authorization: `KakaoAK ${process.env.NEXT_KAKAO_REST_API_KEY}`
+            },
+            params: {
+                query: selectedRegion,
+            }
+        });
+
+        Object.assign(response.data, {
+            selected_region : searchAddressResponse.data.documents[0]
+        });
+    }
+
     if (response.status === 200) {
-        return NextResponse.json(response.data.documents);
+        return NextResponse.json(response.data);
     } else {
         return NextResponse.json({ error: response.statusText }, { status: response.status });
     }

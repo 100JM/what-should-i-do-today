@@ -8,7 +8,7 @@ import useMapData from "../store/useMapData";
 import usePlaceData from "../store/usePlaceData";
 import CategoryButton from "./CategoryButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
-import { faMagnifyingGlass, faAngleLeft, faMapLocationDot } from "@fortawesome/free-solid-svg-icons"
+import { faMagnifyingGlass, faAngleLeft, faAngleDown, faMapLocationDot } from "@fortawesome/free-solid-svg-icons"
 import Skeleton from '@mui/material/Skeleton';
 
 const SearchForm = () => {
@@ -53,12 +53,18 @@ const SearchForm = () => {
 
         try {
             if (searchInputRef.current?.value) {
-    
+
                 const keywordResponse = await axios.get(`api/kakao-keyword-api?x=${myLocation.lng}&y=${myLocation.lat}&keyword=${searchInputRef.current.value}`);
-                setCategoryPlaceList(keywordResponse.data);
+
+                setCategoryPlaceList(keywordResponse.data.documents);
                 setListTitle(`${searchInputRef.current.value} 검색 결과`);
-                setZoomLevel(4);
-                setMapCenter({ lat: Number(keywordResponse.data[0].y), lng: Number(keywordResponse.data[0].x) });
+
+                if (keywordResponse.data.selected_region) {
+                    setMapCenter({ lat: Number(keywordResponse.data.selected_region.y), lng: Number(keywordResponse.data.selected_region.x) });
+                    mapObject?.setCenter(new kakao.maps.LatLng(Number(keywordResponse.data.selected_region.y), Number(keywordResponse.data.selected_region.x)));
+                    setZoomLevel(5);
+                }
+
             }
         } catch (error) {
             console.log('fetchKeywordSearch Error:', error);
@@ -73,17 +79,23 @@ const SearchForm = () => {
         <>
             {!showSearchForm &&
                 <div className="top-6 left-6 z-50 absolute">
-                    <button className="bg-[#2391ff] rounded-xl p-3 flex justify-center items-center hover:bg-[#007fff]" onClick={() => setShowSearchForm(true)}>
+                    <button className="bg-[#2391ff] rounded-xl w-[50px] h-[50px] flex justify-center items-center hover:bg-[#007fff]" onClick={() => setShowSearchForm(true)}>
                         <i className="ri-menu-search-line text-white text-2xl"></i>
                     </button>
                 </div>
             }
-            <div className={`top-0 left-0 z-50 fixed bg-white w-[420px] h-full shadow-2xl rounded-tr-2xl rounded-br-2xl transform transition-transform duration-500 ${showSearchForm ? "translate-x-0" : "-translate-x-full"}`}>
+            <div className={`z-50 fixed bg-white shadow-2xl rounded-tr-2xl rounded-br-2xl transform transition-transform duration-500 ${showSearchForm ? "lg:translate-x-0 lg:translate-y-0 translate-y-0" : "lg:-translate-x-full lg:translate-y-0 translate-y-full"} lg:top-0 lg:left-0 lg:w-[420px] lg:h-full top-auto bottom-0 w-full h-[45%]`}>
                 <button
-                    className={`absolute top-[calc(50%-40px)] left-full bg-white h-10 w-7 shadow-2xl rounded-tr-lg rounded-br-lg border transform transition-opacity duration-500 ${showSearchForm ? "opacity-100" : "opacity-0"}`}
+                    className={`hidden lg:block absolute top-[calc(50%-40px)] left-full bg-white h-10 w-7 shadow-2xl rounded-tr-md rounded-br-md border transform transition-opacity duration-500 ${showSearchForm ? "opacity-100" : "opacity-0"}`}
                     onClick={() => setShowSearchForm(false)}
                 >
                     <FontAwesomeIcon icon={faAngleLeft} />
+                </button>
+                <button
+                    className={`lg:hidden absolute bottom-full left-[calc(50%-20px)] bg-white w-10 h-6 shadow-2xl rounded-tr-md rounded-tl-md border transform transition-opacity duration-500 ${showSearchForm ? "opacity-100" : "opacity-0"}`}
+                    onClick={() => setShowSearchForm(false)}
+                >
+                    <FontAwesomeIcon icon={faAngleDown} />
                 </button>
                 <div className="w-full h-full p-4 flex flex-col">
                     <div className="w-full py-2 px-4 border-2 border-[#2391ff] rounded-3xl">
@@ -106,7 +118,7 @@ const SearchForm = () => {
                     {regionName ?
                         <div className="mt-4 text-lg font-semibold">
                             <i className="ri-map-pin-2-line pr-1"></i>
-                            <span>{regionName}</span>
+                            <span>내 위치 - {regionName}</span>
                         </div>
                         :
                         <Skeleton variant="text" sx={{ marginTop: "16px", borderRadius: "8px", fontSize: "1.25rem" }} />

@@ -3,7 +3,7 @@ export const categoryList = [
         text: '인기 장소',
         icon: 'ri-star-fill',
         color: 'text-orange-400',
-        code: '인기 장소'
+        code: '명소'
     },
     {
         text: '맛집',
