@@ -63,6 +63,10 @@ const SearchForm = () => {
                     setMapCenter({ lat: Number(keywordResponse.data.selected_region.y), lng: Number(keywordResponse.data.selected_region.x) });
                     mapObject?.setCenter(new kakao.maps.LatLng(Number(keywordResponse.data.selected_region.y), Number(keywordResponse.data.selected_region.x)));
                     setZoomLevel(5);
+                } else {
+                    setMapCenter({ lat: Number(keywordResponse.data.documents[0].y), lng: Number(keywordResponse.data.documents[0].x) });
+                    mapObject?.setCenter(new kakao.maps.LatLng(Number(keywordResponse.data.documents[0].y), Number(keywordResponse.data.documents[0].x)));
+                    setZoomLevel(5);
                 }
 
             }
@@ -84,7 +88,7 @@ const SearchForm = () => {
                     </button>
                 </div>
             }
-            <div className={`z-50 fixed bg-white shadow-2xl rounded-tr-2xl rounded-br-2xl transform transition-transform duration-500 ${showSearchForm ? "lg:translate-x-0 lg:translate-y-0 translate-y-0" : "lg:-translate-x-full lg:translate-y-0 translate-y-full"} lg:top-0 lg:left-0 lg:w-[420px] lg:h-full top-auto bottom-0 w-full h-[45%]`}>
+            <div className={`z-50 fixed bg-white shadow-2xl rounded-tr-2xl rounded-tl-2xl lg:rounded-tl-none lg:rounded-br-2xl transform transition-transform duration-500 ${showSearchForm ? "lg:translate-x-0 lg:translate-y-0 translate-y-0" : "lg:-translate-x-full lg:translate-y-0 translate-y-full"} lg:top-0 lg:left-0 lg:w-[420px] lg:h-full top-auto bottom-0 w-full h-[45%]`}>
                 <button
                     className={`hidden lg:block absolute top-[calc(50%-40px)] left-full bg-white h-10 w-7 shadow-2xl rounded-tr-md rounded-br-md border transform transition-opacity duration-500 ${showSearchForm ? "opacity-100" : "opacity-0"}`}
                     onClick={() => setShowSearchForm(false)}
@@ -98,7 +102,7 @@ const SearchForm = () => {
                     <FontAwesomeIcon icon={faAngleDown} />
                 </button>
                 <div className="w-full h-full p-4 flex flex-col">
-                    <div className="w-full py-2 px-4 border-2 border-[#2391ff] rounded-3xl">
+                    <div className="w-full py-1 px-2 text-xs lg:py-2 lg:px-4 lg:text-base border-2 border-[#2391ff] rounded-3xl">
                         <FontAwesomeIcon icon={faMagnifyingGlass} className="text-[#2391ff] cursor-pointer" onClick={handleSearchKeyword} />
                         <input 
                             className="w-[90%] p-1 outline-none"
@@ -112,26 +116,24 @@ const SearchForm = () => {
                             }} 
                         />
                     </div>
-                    <div className="w-[90%] mt-4 flex flex-wrap gap-3">
-                        <CategoryButton clickedButton={clickedButton} handleClickCateBtn={handleClickCateBtn} searchInputRef={searchInputRef} />
-                    </div>
+                    <CategoryButton clickedButton={clickedButton} handleClickCateBtn={handleClickCateBtn} searchInputRef={searchInputRef} />
                     {regionName ?
-                        <div className="mt-4 text-lg font-semibold">
+                        <div className="mt-1 sm:mt-4 text-sm lg:text-lg font-semibold">
                             <i className="ri-map-pin-2-line pr-1"></i>
                             <span>내 위치 - {regionName}</span>
                         </div>
                         :
                         <Skeleton variant="text" sx={{ marginTop: "16px", borderRadius: "8px", fontSize: "1.25rem" }} />
                     }
-                    <div className="mt-4 relative">
+                    <div className="mt-1 lg:mt-4 relative">
                         {listTitle ?
-                            <span className="near-recommend">{listTitle}</span>
+                            <span className="near-recommend text-sm lg:text-base">{listTitle}</span>
                             :
                             <Skeleton variant="rectangular" sx={{ borderRadius: "8px" }} height={24} />
                         }
                     </div>
                     {categoryPlaceList.length > 0 ?
-                        <div className="mt-4 w-full overflow-y-auto custom-scroll-container grid grid-cols-1 gap-4">
+                        <div className="mt-1 lg:mt-4 w-full overflow-y-auto custom-scroll-container grid grid-cols-1 gap-4">
                             {categoryPlaceList.map((cp) => {
                                 return (
                                     <div

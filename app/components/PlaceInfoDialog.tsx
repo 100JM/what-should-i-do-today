@@ -43,7 +43,7 @@ const PlaceInfoDialog = () => {
             <DialogTitle className="flex justify-between items-center border-b">
                 <div>
                     <p className="text-xs">{selectedPlace.category_name}</p>
-                    <p className="text-2xl text-[#2391ff]">{selectedPlace.place_name}</p>
+                    <p className="text-[#2391ff] text-xl xxs:text-2xl">{selectedPlace.place_name}</p>
                     <p className="text-sm text-[#868e96]">{selectedPlace.address_name}<i className="ri-file-copy-2-line"></i></p>
                 </div>
                 <div>
@@ -56,7 +56,7 @@ const PlaceInfoDialog = () => {
                 <div className="mt-5">
                     <div>
                         <input type="file" accept="image/*" capture="environment" className="hidden" ref={fileInputRef} />
-                        <button className="w-full h-40 bg-gray-200 rounded-md text-gray-500" onClick={handleClickFileInput}>
+                        <button className="w-full h-40 bg-gray-200 rounded-md text-gray-500 text-sm xxs:text-base" onClick={handleClickFileInput}>
                             <p>장소와 연관된 사진을 업로드할 수 있어요.</p>
                             <i className="ri-image-add-fill"></i>
                         </button>
@@ -89,11 +89,11 @@ const PlaceInfoDialog = () => {
                 </div>
             </DialogContent>
             <DialogActions>
-                <a href={selectedPlace.place_url} target="_blank" className="bg-[#2391ff] rounded-md text-white p-2 w-1/2 mr-1 text-center">
+                <a href={selectedPlace.place_url} target="_blank" className="bg-[#2391ff] rounded-md text-white p-2 w-1/2 mr-1 text-center text-[10px] xs:text-base xxs:text-xs">
                     <span>카카오 지도에서 보기</span>
                     <i className="ri-external-link-line ml-2"></i>
                 </a>
-                <a href={`https://map.kakao.com/link/roadview/${selectedPlace.id}`} target="_blank" className="bg-[#2391ff] rounded-md text-white p-2 w-1/2 ml-1 text-center">
+                <a href={`https://map.kakao.com/link/roadview/${selectedPlace.id}`} target="_blank" className="bg-[#2391ff] rounded-md text-white p-2 w-1/2 ml-1 text-center text-[10px] xs:text-base xxs:text-xs">
                     <span>로드뷰 바로가기</span>
                     <i className="ri-road-map-line ml-2"></i>
                 </a>

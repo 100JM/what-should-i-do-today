@@ -72,16 +72,16 @@ const CategoryButton: React.FC<CategoryButtonInterface> = ({ clickedButton, hand
     };
 
     return (
-        <>
+        <div className="sm:w-[90%] sm:mt-4 flex flex-nowrap sm:flex-wrap sm:gap-3 sm:overflow-x-visible overflow-x-scroll scrollbar-hide py-6 sm:py-0 justify-start sm:justify-normal items-center">
             {categoryList.map((c) => {
                 return (
-                    <button key={c.icon} className={`py-1 px-2 shadow-md shadow-gray-400 border rounded-3xl group ${clickedButton === c.code ? "text-[#3788d8]" : ""}`} onClick={() => handleClickCategoryBtn(c.code, c.text)}>
+                    <button key={c.icon} className={`whitespace-nowrap mx-1 text-[10px] sm:mx-0 sm:text-sm py-1 px-2 shadow-md shadow-gray-400 border rounded-3xl group ${clickedButton === c.code ? "text-[#3788d8]" : ""}`} onClick={() => handleClickCategoryBtn(c.code, c.text)}>
                         <i className={`${c.icon} ${c.color} p-0`}></i>
-                        <span className="group-hover:text-[#2391ff] ml-1 text-sm">{c.text}</span>
+                        <span className="group-hover:text-[#2391ff] ml-1">{c.text}</span>
                     </button>
                 )
             })}
-        </>
+        </div>
     )
 };
 

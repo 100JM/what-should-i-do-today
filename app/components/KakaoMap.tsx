@@ -97,7 +97,7 @@ const KakaoMap = () => {
                 <MapMarker position={{ lat: (myLocation.lat ? myLocation.lat : 37.5665), lng: (myLocation.lng ? myLocation.lng : 126.9780) }} />
                 <CustomMapOverlay />
                 <button 
-                    className="absolute bottom-6 right-6 z-[11] bg-white w-9 h-9 rounded border shadow-md text-[#2391ff] text-lg flex justify-center items-center"
+                    className="absolute top-6 lg:top-auto lg:bottom-6 right-6 z-[11] bg-white w-9 h-9 rounded border shadow-md text-[#2391ff] text-lg flex justify-center items-center"
                     onClick={handleClickLocationBtn}
                 >
                     <i className="ri-crosshair-2-line"></i>

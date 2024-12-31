@@ -46,6 +46,10 @@ body {
   .place-info {
     flex-direction: column;
   }
+
+  .near-recommend::after {
+    left: 105px;
+  }
 }
 
 .customOverlay::after {
@@ -72,4 +76,10 @@ body {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+
+@media screen and (max-height: 1100px) {
+  .category-button {
+    font-size: 12px;
+  }
 }
