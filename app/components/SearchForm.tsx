@@ -41,6 +41,12 @@ const SearchForm = () => {
         setZoomLevel(1);
         setSelectedPlace(place);
 
+        const currentWidth = window.innerWidth;
+
+        if (currentWidth <= 1024) {
+            setShowSearchForm(false);
+        }
+
         if (selectedPlaceRef[place.id]) {
             selectedPlaceRef[place.id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         }
@@ -88,7 +94,7 @@ const SearchForm = () => {
                     </button>
                 </div>
             }
-            <div className={`z-50 fixed bg-white shadow-2xl rounded-tr-2xl rounded-tl-2xl lg:rounded-tl-none lg:rounded-br-2xl transform transition-transform duration-500 ${showSearchForm ? "lg:translate-x-0 lg:translate-y-0 translate-y-0" : "lg:-translate-x-full lg:translate-y-0 translate-y-full"} lg:top-0 lg:left-0 lg:w-[420px] lg:h-full top-auto bottom-0 w-full h-[45%]`}>
+            <div className={`z-50 fixed bg-white shadow-2xl rounded-tr-2xl rounded-tl-2xl lg:rounded-tl-none lg:rounded-br-2xl transform transition-transform duration-500 ${showSearchForm ? "lg:translate-x-0 lg:translate-y-0 translate-y-0" : "lg:-translate-x-full lg:translate-y-0 translate-y-full"} lg:top-0 lg:left-0 lg:w-[420px] lg:h-full top-auto bottom-0 w-full h-[65%]`}>
                 <button
                     className={`hidden lg:block absolute top-[calc(50%-40px)] left-full bg-white h-10 w-7 shadow-2xl rounded-tr-md rounded-br-md border transform transition-opacity duration-500 ${showSearchForm ? "opacity-100" : "opacity-0"}`}
                     onClick={() => setShowSearchForm(false)}
@@ -118,7 +124,7 @@ const SearchForm = () => {
                     </div>
                     <CategoryButton clickedButton={clickedButton} handleClickCateBtn={handleClickCateBtn} searchInputRef={searchInputRef} />
                     {regionName ?
-                        <div className="mt-1 sm:mt-4 text-sm lg:text-lg font-semibold">
+                        <div className="mt-1 lg:mt-4 text-sm lg:text-lg font-semibold">
                             <i className="ri-map-pin-2-line pr-1"></i>
                             <span>내 위치 - {regionName}</span>
                         </div>
@@ -132,43 +138,43 @@ const SearchForm = () => {
                             <Skeleton variant="rectangular" sx={{ borderRadius: "8px" }} height={24} />
                         }
                     </div>
-                    {categoryPlaceList.length > 0 ?
-                        <div className="mt-1 lg:mt-4 w-full overflow-y-auto custom-scroll-container grid grid-cols-1 gap-4">
-                            {categoryPlaceList.map((cp) => {
-                                return (
-                                    <div
-                                        key={cp.id}
-                                        className={`border rounded-xl p-4 cursor-pointer hover:border-[#2391ff] ${cp.id === selectedPlace.id ? 'border-[#2391ff]' : ''}`}
-                                        onClick={() => handleClickPlace(cp)}
-                                        ref={(el) => {
-                                            if (el && selectedPlaceRef[cp.id] !== el) {
-                                                setSelectedPlaceRef(cp.id, el);
-                                            }
-                                        }}
-                                    >
-                                        <p className="text-xs mb-2 text-[#868e96]">{cp.category_name}</p>
-                                        <p>
-                                            {cp.place_name}
-                                            {cp.category_group_name && <small>({cp.category_group_name})</small>}
-                                        </p>
-                                        <p className="text-sm">{cp.address_name}</p>
-                                        <p className="mt-2 text-sm">
-                                            <FontAwesomeIcon icon={faMapLocationDot} className="text-[#2391ff] text-lg mr-2" />
-                                            현재 위치에서 {cp.distance}m
-                                        </p>
-                                    </div>
-                                )
-                            })}
-                        </div>
-                        :
-                        <div className="mt-4 w-full overflow-y-hidden custom-scroll-container grid grid-cols-1 gap-4">
-                            {Array.from({ length: 15 }, (_, i) => {
-                                return (
-                                    <Skeleton key={i} variant="rectangular" sx={{ borderRadius: "12px", paddingRight: "4px" }} height={120} />
-                                )
-                            })}
-                        </div>
-                    }
+                        {categoryPlaceList.length > 0 ?
+                            <div className="mt-1 lg:mt-4 w-full custom-scroll-container flex flex-col overflow-y-auto gap-4">
+                                {categoryPlaceList.map((cp) => {
+                                    return (
+                                        <div
+                                            key={cp.id}
+                                            className={`border rounded-xl p-2 lg:p-4 cursor-pointer hover:border-[#2391ff] ${cp.id === selectedPlace.id ? 'border-[#2391ff]' : ''}`}
+                                            onClick={() => handleClickPlace(cp)}
+                                            ref={(el) => {
+                                                if (el && selectedPlaceRef[cp.id] !== el) {
+                                                    setSelectedPlaceRef(cp.id, el);
+                                                }
+                                            }}
+                                        >
+                                            <p className="text-xs mb-1 lg:mb-2 text-[#868e96]">{cp.category_name}</p>
+                                            <p className="text-sm lg:text-base">
+                                                {cp.place_name}
+                                                {cp.category_group_name && <small>({cp.category_group_name})</small>}
+                                            </p>
+                                            <p className="text-xs lg:text-sm">{cp.address_name}</p>
+                                            <p className="mt-1 text-xs lg:mt-2 lg:text-sm">
+                                                <FontAwesomeIcon icon={faMapLocationDot} className="text-[#2391ff] lg:text-lg mr-2" />
+                                                현재 위치에서 {cp.distance}m
+                                            </p>
+                                        </div>
+                                    )
+                                })}
+                            </div>
+                            :
+                            <div className="mt-4 w-full overflow-y-hidden custom-scroll-container grid grid-cols-1 gap-4">
+                                {Array.from({ length: 15 }, (_, i) => {
+                                    return (
+                                        <Skeleton key={i} variant="rectangular" sx={{ borderRadius: "12px", paddingRight: "4px" }} height={120} />
+                                    )
+                                })}
+                            </div>
+                        }
                 </div>
             </div>
         </>
