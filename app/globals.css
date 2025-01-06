@@ -19,6 +19,14 @@ body {
   content: "";
 }
 
+.place-img-div .place-img:not(:last-child) {
+  margin-right: 8px;
+}
+
+*::-webkit-scrollbar:horizontal {
+  height: 8px;
+}
+
 *::-webkit-scrollbar {
   width: 8px;
 }

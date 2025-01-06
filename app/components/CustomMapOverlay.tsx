@@ -1,5 +1,6 @@
 import { CustomOverlayMap } from 'react-kakao-maps-sdk'
 import { categoryPlace } from '@/types/categoryData';
+import axios from 'axios';
 
 import useDialog from '../store/useDialog';
 import usePlaceData from '../store/usePlaceData';
@@ -8,16 +9,27 @@ import useMapData from '../store/useMapData';
 const CustomMapOverlay = () => {
     const { setShowPlaceInfo } = useDialog();
     const { setZoomLevel, setMapCenter } = useMapData();
-    const { categoryPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef } = usePlaceData();
+    const { categoryPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef, setSelectedPlacePhoto } = usePlaceData();
 
     const handleClickOverlay = (place: categoryPlace) => {
-        setMapCenter({lat: Number(place.y), lng: Number(place.x)});
+        setMapCenter({ lat: Number(place.y), lng: Number(place.x) });
         setZoomLevel(1);
         setSelectedPlace(place);
-        setShowPlaceInfo(true);
+        fetchPlacePhoto(place.id);
 
         if (selectedPlaceRef[place.id]) {
             selectedPlaceRef[place.id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+    };
+
+    const fetchPlacePhoto = async (id: string) => {
+        try {
+            const response = await axios.get(`api/get-placephoto-api?id=${id}`);
+            const photoArray = response.data.map((r: {id: string, photo: string}) => r.photo);
+            setSelectedPlacePhoto(photoArray);
+            setShowPlaceInfo(true);
+        } catch (error) {
+            console.log('fetchPlacePhoto Error:', error);
         }
     };
 

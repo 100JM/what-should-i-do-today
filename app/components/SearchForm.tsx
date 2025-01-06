@@ -157,7 +157,7 @@ const SearchForm = () => {
                                                 {cp.place_name}
                                                 {cp.category_group_name && <small>({cp.category_group_name})</small>}
                                             </p>
-                                            <p className="text-xs lg:text-sm">{cp.address_name}</p>
+                                            <p className="text-xs lg:text-sm">{cp.road_address_name ? cp.road_address_name : cp.address_name}</p>
                                             <p className="mt-1 text-xs lg:mt-2 lg:text-sm">
                                                 <FontAwesomeIcon icon={faMapLocationDot} className="text-[#2391ff] lg:text-lg mr-2" />
                                                 현재 위치에서 {cp.distance}m
