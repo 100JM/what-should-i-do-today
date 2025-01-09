@@ -1,4 +1,4 @@
-export const resizeImg = (file: File, quality = 0.7): Promise<Blob> => {
+export const resizeImg = (file: File, id: string, quality = 0.7): Promise<Blob> => {
     return new Promise((resolve) => {
         const reader = new FileReader();
         const [maxHeight, maxWidth] = [1200, 1200];
@@ -37,8 +37,11 @@ export const resizeImg = (file: File, quality = 0.7): Promise<Blob> => {
 
                 // 압축 적용
                 canvas.toBlob((blob) => {
-                    if (blob) resolve(blob);
-                }, 'image/png', quality);
+                    if (blob) {
+                        const resizedFile = new File([blob], id, { type: blob.type })
+                        resolve(resizedFile);
+                    }
+                }, 'image/jpeg', quality);
             };
 
             img.src = event.target?.result as string;

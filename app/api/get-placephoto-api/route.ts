@@ -22,6 +22,6 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
         return NextResponse.json(selectedDocs);
     } catch (error) {
-        return NextResponse.json({ error: error }, { status: 500 })
+        return NextResponse.json({ error: error }, { status: 500 });
     }
 };

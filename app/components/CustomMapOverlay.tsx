@@ -15,7 +15,8 @@ const CustomMapOverlay = () => {
         setMapCenter({ lat: Number(place.y), lng: Number(place.x) });
         setZoomLevel(1);
         setSelectedPlace(place);
-        fetchPlacePhoto(place.id);
+        setShowPlaceInfo(true);
+        // fetchPlacePhoto(place.id);
 
         if (selectedPlaceRef[place.id]) {
             selectedPlaceRef[place.id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -25,7 +26,7 @@ const CustomMapOverlay = () => {
     const fetchPlacePhoto = async (id: string) => {
         try {
             const response = await axios.get(`api/get-placephoto-api?id=${id}`);
-            const photoArray = response.data.map((r: {id: string, photo: string}) => r.photo);
+            const photoArray = response.data.map((r: {id: string, name: string, photo: string}) => r);
             setSelectedPlacePhoto(photoArray);
             setShowPlaceInfo(true);
         } catch (error) {

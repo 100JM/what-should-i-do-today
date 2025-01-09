@@ -1,6 +1,8 @@
 import Image from 'next/image';
-import { ChangeEvent, useRef } from 'react';
+import { ChangeEvent, useRef, useEffect } from 'react';
 import { Map, MapMarker, useKakaoLoader } from 'react-kakao-maps-sdk'
+import axios from 'axios';
+import dayjs from 'dayjs';
 
 import useDialog from '../store/useDialog';
 import usePlaceData from '../store/usePlaceData';
@@ -37,6 +39,16 @@ const PlaceInfoDialog = () => {
         ((fileInputRef.current) as HTMLInputElement).click();
     };
 
+    const fetchPlacePhoto = async (id: string) => {
+        try {
+            const response = await axios.get(`api/get-placephoto-api?id=${id}`);
+            // const photoArray = response.data.map((r: {id: string, name: string, photo: string}) => r);
+            setSelectedPlacePhoto(response.data);
+        } catch (error) {
+            console.log('fetchPlacePhoto Error:', error);
+        }
+    };
+
     const handleUploadPhoto = async (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const fileList = Array.from(e.target.files);
@@ -50,15 +62,34 @@ const PlaceInfoDialog = () => {
                 return;
             } else {
                 const resizeList = await Promise.all(
-                    fileList.map(async (f) => await resizeImg(f))
+                    fileList.map(async (f, i) => await resizeImg(f, `${selectedPlace.id}_${f.name}_${dayjs().format('HH:mm:ss')}`))
                 );
 
-                console.log(URL.createObjectURL(resizeList[0]));
-                // URL.revokeObjectURL(URL.createObjectURL(resizeList[0]));
+                const formData = new FormData();
+
+                formData.append('id', selectedPlace.id);
+                resizeList.forEach((rf) => {
+                    formData.append(`file[]`, rf);
+                });
+
+                try {
+                    await axios.post('/api/add-placephoto-api', formData);
+
+                    fetchPlacePhoto(selectedPlace.id);
+
+                } catch (error) {
+                    console.log('fetch add photo Error:', error);
+                }
 
             }
         }
     };
+
+    useEffect(() => {
+        if (selectedPlace?.id) {
+            fetchPlacePhoto(selectedPlace.id);
+        }
+    }, [selectedPlace]);
 
     const handleCopyAddress = (text: string | undefined) => {
         if (text) {
@@ -99,9 +130,9 @@ const PlaceInfoDialog = () => {
                                     {selectedPlacePhoto.map((p) => {
                                         return (
                                             <Image
-                                                key={p}
-                                                src={p}
-                                                alt="장소 사진"
+                                                key={p.name}
+                                                src={p.photo}
+                                                alt={p.name}
                                                 layout="responsive"
                                                 width={16}
                                                 height={9}

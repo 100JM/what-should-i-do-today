@@ -7,8 +7,16 @@ interface usePlaceDataInterface {
     selectedPlace: categoryPlace;
     setSelectedPlace: (place: categoryPlace) => void;
     resetSelectedPlace: () => void;
-    selectedPlacePhoto: Array<string>;
-    setSelectedPlacePhoto: (photo: Array<string>) => void;
+    selectedPlacePhoto: Array<{
+        id: string,
+        name: string,
+        photo: string
+    }>;
+    setSelectedPlacePhoto: (photo: Array<{
+        id: string,
+        name: string,
+        photo: string
+    }>) => void;
     selectedPlaceRef: Record<string, HTMLDivElement | null>;
     setSelectedPlaceRef: (key: string, ref: HTMLDivElement | null) => void;
     resetSelectedPlaceRef: () => void;
@@ -49,7 +57,11 @@ const usePlaceData = create<usePlaceDataInterface>((set) => ({
         distance: '',
     }}),
     selectedPlacePhoto: [],
-    setSelectedPlacePhoto: (photo: Array<string>) => set({ selectedPlacePhoto: photo}),
+    setSelectedPlacePhoto: (photo: Array<{
+        id: string,
+        name: string,
+        photo: string
+    }>) => set({ selectedPlacePhoto: photo}),
     selectedPlaceRef: {},
     setSelectedPlaceRef: (key: string, ref: HTMLDivElement | null) => set((state) => ({ selectedPlaceRef: { ...state.selectedPlaceRef, [key]: ref } })),
     resetSelectedPlaceRef: () => set({ selectedPlaceRef: {} }),
