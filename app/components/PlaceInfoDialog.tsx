@@ -32,7 +32,6 @@ const PlaceInfoDialog = () => {
     const handleClosePlaceInfoDialog = () => {
         setShowPlaceInfo(false)
         resetSelectedPlace();
-        setSelectedPlacePhoto([]);
     };
 
     const handleClickFileInput = () => {
@@ -42,7 +41,6 @@ const PlaceInfoDialog = () => {
     const fetchPlacePhoto = async (id: string) => {
         try {
             const response = await axios.get(`api/get-placephoto-api?id=${id}`);
-            // const photoArray = response.data.map((r: {id: string, name: string, photo: string}) => r);
             setSelectedPlacePhoto(response.data);
         } catch (error) {
             console.log('fetchPlacePhoto Error:', error);
@@ -85,12 +83,6 @@ const PlaceInfoDialog = () => {
         }
     };
 
-    useEffect(() => {
-        if (selectedPlace?.id) {
-            fetchPlacePhoto(selectedPlace.id);
-        }
-    }, [selectedPlace]);
-
     const handleCopyAddress = (text: string | undefined) => {
         if (text) {
             navigator.clipboard.writeText(text).then(() => showToatst('주소가 복사되었습니다.', { type: 'success' })).catch(() => showToatst('일시적인 오류가 발생했습니다.', { type: 'error' }));
@@ -122,11 +114,11 @@ const PlaceInfoDialog = () => {
                         <div>
                             <input type="file" accept="image/*" capture="environment" className="hidden" ref={fileInputRef} multiple onChange={(e: ChangeEvent<HTMLInputElement>) => handleUploadPhoto(e)} />
                             <div className="flex">
-                                <button className="w-1/3 h-52 mr-4 bg-gray-200 rounded-md text-gray-500 text-xs" onClick={handleClickFileInput}>
+                                <button className="w-[35%] h-52 mr-4 bg-gray-200 rounded-md text-gray-500 text-xs" onClick={handleClickFileInput}>
                                     <p>사진 업로드</p>
                                     <i className="ri-image-add-fill"></i>
                                 </button>
-                                <div className="flex w-2/3 h-52 overflow-x-auto place-img-div">
+                                <div className="flex max-w-[65%] h-52 overflow-x-auto place-img-div">
                                     {selectedPlacePhoto.map((p) => {
                                         return (
                                             <Image

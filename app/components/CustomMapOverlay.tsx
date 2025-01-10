@@ -8,15 +8,22 @@ import useMapData from '../store/useMapData';
 
 const CustomMapOverlay = () => {
     const { setShowPlaceInfo } = useDialog();
-    const { setZoomLevel, setMapCenter } = useMapData();
+    const { setZoomLevel, setMapCenter, mapObject } = useMapData();
     const { categoryPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef, setSelectedPlacePhoto } = usePlaceData();
 
     const handleClickOverlay = (place: categoryPlace) => {
-        setMapCenter({ lat: Number(place.y), lng: Number(place.x) });
+        const lat = Number(place.y);
+        const lng = Number(place.x);
+
+        setMapCenter({ lat: lat, lng: lng });
+
+        if (mapObject) {
+            mapObject.setCenter(new kakao.maps.LatLng(lat, lng));
+        }
+
         setZoomLevel(1);
         setSelectedPlace(place);
-        setShowPlaceInfo(true);
-        // fetchPlacePhoto(place.id);
+        fetchPlacePhoto(place.id);
 
         if (selectedPlaceRef[place.id]) {
             selectedPlaceRef[place.id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });

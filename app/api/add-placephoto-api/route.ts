@@ -8,10 +8,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const placeId = formData.get('id');
     const files = formData.getAll('file[]');
 
-    console.log(files);
-
     const uploadImg = async (file: File) => {
-        const storageRef = ref(storage, `images/${file.name}`);
+        const storageRef = ref(storage, `placeImages/${file.name}`);
         await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(storageRef);
         return downloadURL;
