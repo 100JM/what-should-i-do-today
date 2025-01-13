@@ -9,9 +9,9 @@ import useMapData from '../store/useMapData';
 const CustomMapOverlay = () => {
     const { setShowPlaceInfo } = useDialog();
     const { setZoomLevel, setMapCenter, mapObject } = useMapData();
-    const { categoryPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef, setSelectedPlacePhoto } = usePlaceData();
+    const { categoryPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef, setSelectedPlacePhoto, setSelectedPlaceReview } = usePlaceData();
 
-    const handleClickOverlay = (place: categoryPlace) => {
+    const handleClickOverlay = async (place: categoryPlace) => {
         const lat = Number(place.y);
         const lng = Number(place.x);
 
@@ -23,7 +23,11 @@ const CustomMapOverlay = () => {
 
         setZoomLevel(1);
         setSelectedPlace(place);
-        fetchPlacePhoto(place.id);
+        
+        await Promise.all([
+            fetchPlacePhoto(place.id),
+            fetchPlaceReview(place.id)
+        ]).then(() => setShowPlaceInfo(true));
 
         if (selectedPlaceRef[place.id]) {
             selectedPlaceRef[place.id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -32,10 +36,17 @@ const CustomMapOverlay = () => {
 
     const fetchPlacePhoto = async (id: string) => {
         try {
-            const response = await axios.get(`api/get-placephoto-api?id=${id}`);
-            const photoArray = response.data.map((r: {id: string, name: string, photo: string}) => r);
-            setSelectedPlacePhoto(photoArray);
-            setShowPlaceInfo(true);
+            const response = await axios.get(`api/place-data-api?id=${id}`);
+            setSelectedPlacePhoto(response.data);
+        } catch (error) {
+            console.log('fetchPlacePhoto Error:', error);
+        }
+    };
+
+    const fetchPlaceReview = async (id: string) => {
+        try {
+            const response = await axios.get(`api/review-data-api?id=${id}`);
+            setSelectedPlaceReview(response.data);
         } catch (error) {
             console.log('fetchPlacePhoto Error:', error);
         }

@@ -8,11 +8,11 @@ import useDialog from '../store/useDialog';
 import usePlaceData from '../store/usePlaceData';
 import { resizeImg } from '../utils/resizeImg';
 
+import PlaceReview from './PlaceReview';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
-import Rating from '@mui/material/Rating';
 
 const PlaceInfoDialog = () => {
     const { loading, error } = useKakaoLoader({
@@ -40,7 +40,7 @@ const PlaceInfoDialog = () => {
 
     const fetchPlacePhoto = async (id: string) => {
         try {
-            const response = await axios.get(`api/get-placephoto-api?id=${id}`);
+            const response = await axios.get(`api/place-data-api?id=${id}`);
             setSelectedPlacePhoto(response.data);
         } catch (error) {
             console.log('fetchPlacePhoto Error:', error);
@@ -71,7 +71,7 @@ const PlaceInfoDialog = () => {
                 });
 
                 try {
-                    await axios.post('/api/add-placephoto-api', formData);
+                    await axios.post('api/place-data-api', formData);
 
                     fetchPlacePhoto(selectedPlace.id);
 
@@ -157,18 +157,7 @@ const PlaceInfoDialog = () => {
                             <MapMarker position={{ lat: Number(selectedPlace.y), lng: Number(selectedPlace.x) }} />
                         </Map>
                     </div>
-                    <div className="w-full overflow-y-auto h-80 lg:w-1/2 lg:ml-2">
-                        <div>
-                            <h3 className="text-gray-500">장소에 대한 의견을 남겨주세요.</h3>
-                            <Rating name="size-medium" defaultValue={5} />
-                            <div>
-                                <input type="text" className="border-b focus:outline-none w-full" />
-                            </div>
-                        </div>
-                        <div className="h-[calc(100%-80px)] flex justify-center items-center">
-                            <span>기록된 리뷰가 없습니다🥲</span>
-                        </div>
-                    </div>
+                    <PlaceReview />
                 </div>
             </DialogContent>
             <DialogActions>

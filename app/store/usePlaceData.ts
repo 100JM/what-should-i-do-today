@@ -1,5 +1,6 @@
 import { create } from "zustand";
 import { categoryPlace } from "@/types/categoryData";
+import { reviews, placePhoto } from "@/types/placeData";
 
 interface usePlaceDataInterface {
     categoryPlaceList: Array<categoryPlace>;
@@ -7,21 +8,15 @@ interface usePlaceDataInterface {
     selectedPlace: categoryPlace;
     setSelectedPlace: (place: categoryPlace) => void;
     resetSelectedPlace: () => void;
-    selectedPlacePhoto: Array<{
-        id: string,
-        name: string,
-        photo: string
-    }>;
-    setSelectedPlacePhoto: (photo: Array<{
-        id: string,
-        name: string,
-        photo: string
-    }>) => void;
+    selectedPlacePhoto: Array<placePhoto>;
+    setSelectedPlacePhoto: (photo: Array<placePhoto>) => void;
     selectedPlaceRef: Record<string, HTMLDivElement | null>;
     setSelectedPlaceRef: (key: string, ref: HTMLDivElement | null) => void;
     resetSelectedPlaceRef: () => void;
     listTitle: string;
     setListTitle: (title: string) => void;
+    selectedPlaceReview: Array<reviews>;
+    setSelectedPlaceReview: (reviews: Array<reviews>) => void;
 }
 
 const usePlaceData = create<usePlaceDataInterface>((set) => ({
@@ -57,16 +52,14 @@ const usePlaceData = create<usePlaceDataInterface>((set) => ({
         distance: '',
     }}),
     selectedPlacePhoto: [],
-    setSelectedPlacePhoto: (photo: Array<{
-        id: string,
-        name: string,
-        photo: string
-    }>) => set({ selectedPlacePhoto: photo}),
+    setSelectedPlacePhoto: (photo: Array<placePhoto>) => set({ selectedPlacePhoto: photo}),
     selectedPlaceRef: {},
     setSelectedPlaceRef: (key: string, ref: HTMLDivElement | null) => set((state) => ({ selectedPlaceRef: { ...state.selectedPlaceRef, [key]: ref } })),
     resetSelectedPlaceRef: () => set({ selectedPlaceRef: {} }),
     listTitle: '',
     setListTitle: (title: string) => set({ listTitle: title }),
+    selectedPlaceReview: [],
+    setSelectedPlaceReview: (reviews: Array<reviews>) => set({ selectedPlaceReview: reviews }),
 }));
 
 export default usePlaceData;
