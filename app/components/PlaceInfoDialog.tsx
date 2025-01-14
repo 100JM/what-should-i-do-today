@@ -13,6 +13,8 @@ import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
 import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
+import { Gallery, Item } from 'react-photoswipe-gallery';
+import 'photoswipe/dist/photoswipe.css';
 
 const PlaceInfoDialog = () => {
     const { loading, error } = useKakaoLoader({
@@ -68,7 +70,7 @@ const PlaceInfoDialog = () => {
 
                 try {
                     const addPhotoResponse = await axios.post('api/place-data-api', formData);
-                    
+
                     if (addPhotoResponse.status === 200) {
                         fetchPlacePhoto(selectedPlace.id);
                     }
@@ -92,7 +94,7 @@ const PlaceInfoDialog = () => {
     return (
         <Dialog
             open={showPlaceInfo}
-            onClose={handleClosePlaceInfoDialog}
+            // onClose={handleClosePlaceInfoDialog}
             maxWidth="lg"
             fullWidth={true}
         >
@@ -118,7 +120,7 @@ const PlaceInfoDialog = () => {
                                     <p>사진 업로드</p>
                                     <i className="ri-image-add-fill"></i>
                                 </button>
-                                <div className="flex max-w-[65%] h-52 overflow-x-auto place-img-div">
+                                {/* <div className="flex max-w-[65%] h-52 overflow-x-auto place-img-div">
                                     {selectedPlacePhoto.map((p) => {
                                         return (
                                             <Image
@@ -132,6 +134,34 @@ const PlaceInfoDialog = () => {
                                             />
                                         )
                                     })}
+                                </div> */}
+                                <div className="flex max-w-[65%] h-52 overflow-x-auto place-img-div">
+                                    <Gallery>
+                                        {selectedPlacePhoto.map((p) => {
+                                            return (
+                                                <Item
+                                                    original={p.photo}
+                                                    thumbnail={p.photo}
+                                                    width="1000"
+                                                    height="1000"
+                                                >
+                                                    {({ ref, open }) => (
+                                                        <Image
+                                                            ref={ref}
+                                                            onClick={open}
+                                                            key={p.name}
+                                                            src={p.photo}
+                                                            alt={p.name}
+                                                            layout="responsive"
+                                                            width={16}
+                                                            height={9}
+                                                            className="rounded-md place-img cursor-pointer"
+                                                        />
+                                                    )}
+                                                </Item>
+                                            )
+                                        })}
+                                    </Gallery>
                                 </div>
                             </div>
                         </div>
