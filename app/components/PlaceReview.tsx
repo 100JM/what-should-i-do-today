@@ -19,8 +19,11 @@ const PlaceReview = () => {
     const handleReviewBtn = async () => {
         const reviewInputValue = reviewInputRef.current?.value;
 
+        reviewInputRef.current?.blur();
+
         if (!reviewInputValue) {
             showToatst('리뷰 내용을 작성해주세요.', { type: 'error' });
+            reviewInputRef.current?.focus();
             return;
         }
 
@@ -58,7 +61,16 @@ const PlaceReview = () => {
                 <h3 className="text-gray-500">장소에 대한 의견을 남겨주세요.</h3>
                 <Rating name="size-small" size="small" defaultValue={5} onChange={(e) => handleChangeRate((e.target as HTMLInputElement).value)} />
                 <div className="w-full flex items-center border-b">
-                    <input type="text" className="focus:outline-none w-[calc(100%-24px)]" ref={reviewInputRef} />
+                    <input 
+                        type="text"
+                        className="focus:outline-none w-[calc(100%-24px)]"
+                        ref={reviewInputRef}
+                        onKeyUp={(key) => {
+                            if (key.key === 'Enter') {
+                                handleReviewBtn();
+                            }
+                        }}
+                    />
                     <i className="ri-edit-2-line w-6 text-center text-lg cursor-pointer text-[#2391ff]" onClick={handleReviewBtn}></i>
                 </div>
             </div>

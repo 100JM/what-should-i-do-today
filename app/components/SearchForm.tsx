@@ -124,7 +124,7 @@ const SearchForm = () => {
                                 if (key.key === 'Enter') {
                                     handleSearchKeyword();
                                 }
-                            }} 
+                            }}
                         />
                     </div>
                     <CategoryButton clickedButton={clickedButton} handleClickCateBtn={handleClickCateBtn} searchInputRef={searchInputRef} />
