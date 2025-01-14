@@ -7,7 +7,7 @@ export default function Home() {
     <div className="w-full h-full">
       <KakaoMap />
       <SearchForm />
-      <Toaster position="bottom-center" />
+      <Toaster position="top-center" />
     </div>
   );
 }

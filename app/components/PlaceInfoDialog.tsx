@@ -50,13 +50,12 @@ const PlaceInfoDialog = () => {
     const handleUploadPhoto = async (e: ChangeEvent<HTMLInputElement>) => {
         if (e.target.files) {
             const fileList = Array.from(e.target.files);
-            console.log(fileList);
             const isNotImg = fileList.find((f) => {
                 return !f.type.includes('image');
             });
 
             if (isNotImg) {
-                alert('이미지 파일만 선택해주세요.');
+                showToatst('이미지 파일만 선택해주세요.', { type: 'error' });
                 return;
             } else {
                 const resizeList = await Promise.all(
@@ -71,10 +70,11 @@ const PlaceInfoDialog = () => {
                 });
 
                 try {
-                    await axios.post('api/place-data-api', formData);
-
-                    fetchPlacePhoto(selectedPlace.id);
-
+                    const addPhotoResponse = await axios.post('api/place-data-api', formData);
+                    
+                    if (addPhotoResponse.status === 200) {
+                        fetchPlacePhoto(selectedPlace.id);
+                    }
                 } catch (error) {
                     console.log('fetch add photo Error:', error);
                 }

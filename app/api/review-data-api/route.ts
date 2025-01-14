@@ -40,18 +40,9 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
     const formData = await request.formData();
-    // const placeId = formData.get('id');
-    // const review = formData.get('review');
-    // const rate = formData.get('rate');
-    // const date = formData.get('date');
 
     try {
-        const data = {
-            id: formData.get('id'),
-            review: formData.get('review'),
-            rate: formData.get('rate'),
-            date: formData.get('date'),
-        };
+        const data = Object.fromEntries(formData.entries());
     
         await addDoc(collection(db, 'place_review'), data);
     

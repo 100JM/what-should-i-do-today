@@ -10,6 +10,7 @@ import CategoryButton from "./CategoryButton";
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faMagnifyingGlass, faAngleLeft, faAngleDown, faMapLocationDot } from "@fortawesome/free-solid-svg-icons"
 import Skeleton from '@mui/material/Skeleton';
+import useDialog from "../store/useDialog";
 
 const SearchForm = () => {
     const [showSearchForm, setShowSearchForm] = useState<boolean>(true);
@@ -18,6 +19,7 @@ const SearchForm = () => {
 
     const { setZoomLevel, myLocation, mapCenter, setMapCenter, mapObject } = useMapData();
     const { categoryPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef, setSelectedPlaceRef, listTitle, setListTitle, resetSelectedPlaceRef, resetSelectedPlace, setCategoryPlaceList } = usePlaceData();
+    const { showToatst } = useDialog();
 
     const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -75,6 +77,9 @@ const SearchForm = () => {
                     setZoomLevel(5);
                 }
 
+            } else {
+                showToatst('검색어를 입력해주세요.', { type: 'error' });
+                return;
             }
         } catch (error) {
             console.log('fetchKeywordSearch Error:', error);
@@ -84,7 +89,7 @@ const SearchForm = () => {
     useEffect(() => {
         fetchAddress();
     }, [myLocation]);
-    console.log(categoryPlaceList);
+
     return (
         <>
             {!showSearchForm &&
