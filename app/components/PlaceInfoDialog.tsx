@@ -144,12 +144,12 @@ const PlaceInfoDialog = () => {
                                                     thumbnail={p.photo}
                                                     width="1000"
                                                     height="1000"
+                                                    key={p.name}
                                                 >
                                                     {({ ref, open }) => (
                                                         <Image
                                                             ref={ref}
                                                             onClick={open}
-                                                            key={p.name}
                                                             src={p.photo}
                                                             alt={p.name}
                                                             layout="responsive"
