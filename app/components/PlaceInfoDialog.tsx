@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { ChangeEvent, useRef, useEffect } from 'react';
+import { ChangeEvent, useRef } from 'react';
 import { Map, MapMarker, useKakaoLoader } from 'react-kakao-maps-sdk'
 import axios from 'axios';
 import dayjs from 'dayjs';
@@ -19,9 +19,6 @@ const PlaceInfoDialog = () => {
         appkey: process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY || '',
         libraries: ['services'],
     }) as unknown as { loading: boolean; error: ErrorEvent | undefined };
-
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error loading map: {error.message}</div>;
 
     const { showPlaceInfo, setShowPlaceInfo, showToatst } = useDialog();
     const { selectedPlace, resetSelectedPlace, selectedPlacePhoto, setSelectedPlacePhoto } = usePlaceData();
@@ -59,7 +56,7 @@ const PlaceInfoDialog = () => {
                 return;
             } else {
                 const resizeList = await Promise.all(
-                    fileList.map(async (f, i) => await resizeImg(f, `${selectedPlace.id}_${f.name}_${dayjs().format('HH:mm:ss')}`))
+                    fileList.map(async (f) => await resizeImg(f, `${selectedPlace.id}_${f.name}_${dayjs().format('HH:mm:ss')}`))
                 );
 
                 const formData = new FormData();
@@ -88,6 +85,9 @@ const PlaceInfoDialog = () => {
             navigator.clipboard.writeText(text).then(() => showToatst('주소가 복사되었습니다.', { type: 'success' })).catch(() => showToatst('일시적인 오류가 발생했습니다.', { type: 'error' }));
         }
     };
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error loading map: {error.message}</div>;
 
     return (
         <Dialog

@@ -34,9 +34,6 @@ const KakaoMap = () => {
         }
     };
 
-    if (loading) return <div>Loading...</div>;
-    if (error) return <div>Error loading map: {error.message}</div>;
-
     const handleClickLocationBtn = () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((geo) => {
@@ -58,7 +55,7 @@ const KakaoMap = () => {
         }
     };
 
-    useEffect(() => {
+    const initMapEvt = () => {
         if (navigator.geolocation) {
             navigator.geolocation.getCurrentPosition((geo) => {
                 setMyLocation({ lat: geo.coords.latitude, lng: geo.coords.longitude });
@@ -73,7 +70,14 @@ const KakaoMap = () => {
                     enableHighAccuracy: true
                 })
         }
+    };
+
+    useEffect(() => {
+        initMapEvt();
     }, []);
+
+    if (loading) return <div>Loading...</div>;
+    if (error) return <div>Error loading map: {error.message}</div>;
 
     return (
         <>

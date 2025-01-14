@@ -6,8 +6,8 @@ interface useMapInterface {
         lng: number | undefined
     };
     setMapCenter: (center: {lat: number, lng:number}) => void;
-    zoomLevel: Number;
-    setZoomLevel: (level: Number) => void;
+    zoomLevel: number;
+    setZoomLevel: (level: number) => void;
     myLocation: {
         lat: number | undefined,
         lng: number | undefined
@@ -24,7 +24,7 @@ const useMapData = create<useMapInterface>((set) => ({
     },
     setMapCenter: (center: {lat: number, lng:number}) => set({ mapCenter: center }),
     zoomLevel: 5,
-    setZoomLevel: (level :Number) => set({ zoomLevel: level }),
+    setZoomLevel: (level :number) => set({ zoomLevel: level }),
     myLocation: {
         lat: undefined,
         lng: undefined
