@@ -1,4 +1,10 @@
-export const resizeImg = (file: File, id: string, quality = 0.7): Promise<Blob> => {
+interface ResizedFileInterface {
+    file: File;
+    width: number;
+    height: number;
+}
+
+export const resizeImg = (file: File, id: string, quality = 0.7): Promise<ResizedFileInterface> => {
     return new Promise((resolve) => {
         const reader = new FileReader();
         const [maxHeight, maxWidth] = [1200, 1200];
@@ -38,7 +44,11 @@ export const resizeImg = (file: File, id: string, quality = 0.7): Promise<Blob> 
                 // 압축 적용
                 canvas.toBlob((blob) => {
                     if (blob) {
-                        const resizedFile = new File([blob], id, { type: blob.type })
+                        const resizedFile = {
+                            file: new File([blob], id, { type: blob.type }),
+                            width: img.width,
+                            height: img.height,
+                        };
                         resolve(resizedFile);
                     }
                 }, 'image/jpeg', quality);

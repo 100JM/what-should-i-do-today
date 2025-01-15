@@ -7,6 +7,9 @@ export interface reviews {
 
 export interface placePhoto {
     id: string;
+    userId: string;
     name: string;
     photo: string;
-}
+    width: string;
+    height: string;
+}2

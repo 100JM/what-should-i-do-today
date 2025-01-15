@@ -2,6 +2,7 @@
 
 import { useEffect } from 'react';
 import axios from 'axios';
+import { useSession } from 'next-auth/react';
 
 import useMapData from '../store/useMapData';
 import usePlaceData from '../store/usePlaceData';
@@ -12,9 +13,11 @@ import CustomMapOverlay from './CustomMapOverlay';
 import PlaceInfoDialog from './PlaceInfoDialog';
 
 const KakaoMap = () => {
-    const { showPlaceInfo } = useDialog();
+    const { showPlaceInfo, setShowLogin } = useDialog();
     const { mapCenter, setMapCenter, zoomLevel, setZoomLevel, myLocation, setMyLocation, mapObject, setMapObject } = useMapData();
     const { setCategoryPlaceList, resetSelectedPlaceRef, setListTitle } = usePlaceData();
+    const { data: session, status } = useSession();
+    console.log(status);
 
     const { loading, error } = useKakaoLoader({
         appkey: process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY || '',
@@ -100,12 +103,24 @@ const KakaoMap = () => {
             >
                 <MapMarker position={{ lat: (myLocation.lat ? myLocation.lat : 37.5665), lng: (myLocation.lng ? myLocation.lng : 126.9780) }} />
                 <CustomMapOverlay />
-                <button 
-                    className="absolute top-6 lg:top-auto lg:bottom-6 right-6 z-[11] bg-white w-9 h-9 rounded border shadow-md text-[#2391ff] text-lg flex justify-center items-center"
+                <button
+                    className="absolute top-4 left-4 lg:left-[436px] z-[11] bg-white w-9 h-9 rounded border shadow-md text-[#2391ff] text-lg flex justify-center items-center"
                     onClick={handleClickLocationBtn}
                 >
                     <i className="ri-crosshair-2-line"></i>
                 </button>
+                {status !== 'loading' &&
+                    <button
+                        className="absolute top-4 right-4 z-[11] bg-white w-9 h-9 rounded border shadow-md text-[#2391ff] text-lg flex justify-center items-center"
+                        onClick={() => setShowLogin(true)}
+                    >
+                        {session?.userId ?
+                            <i className="ri-user-line"></i>
+                            :
+                            <i className="ri-login-circle-line"></i>
+                        }
+                    </button>
+                }
             </Map>
             {showPlaceInfo && <PlaceInfoDialog />}
         </>

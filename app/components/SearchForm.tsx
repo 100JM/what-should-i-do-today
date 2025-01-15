@@ -17,7 +17,7 @@ const SearchForm = () => {
     const [regionName, setRegionName] = useState<string>('');
     const [clickedButton, setClickedButton] = useState<string>('');
 
-    const { setZoomLevel, myLocation, mapCenter, setMapCenter, mapObject } = useMapData();
+    const { setZoomLevel, myLocation, setMapCenter, mapObject } = useMapData();
     const { categoryPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef, setSelectedPlaceRef, listTitle, setListTitle, resetSelectedPlaceRef, resetSelectedPlace, setCategoryPlaceList } = usePlaceData();
     const { showToatst } = useDialog();
 
@@ -62,7 +62,7 @@ const SearchForm = () => {
         try {
             if (searchInputRef.current?.value) {
 
-                const keywordResponse = await axios.get(`api/kakao-keyword-api?x=${mapCenter.lng}&y=${mapCenter.lat}&keyword=${searchInputRef.current.value}`);
+                const keywordResponse = await axios.get(`api/kakao-keyword-api?x=${mapObject?.getCenter().getLng()}&y=${mapObject?.getCenter().getLat()}&keyword=${searchInputRef.current.value}`);
 
                 setCategoryPlaceList(keywordResponse.data.documents);
                 setListTitle(`${searchInputRef.current.value} 검색 결과`);

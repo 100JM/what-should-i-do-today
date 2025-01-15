@@ -8,12 +8,16 @@ interface CustomToastOptions extends ToastOptions {
 interface useDialogInterface {
     showPlaceInfo: boolean;
     setShowPlaceInfo: (isShow: boolean) => void;
+    showLogin: boolean;
+    setShowLogin: (isShow: boolean) => void;
     showToatst: (msg: string, option: CustomToastOptions) => void;
 }
 
 const useDialog = create<useDialogInterface>((set) => ({
     showPlaceInfo: false,
     setShowPlaceInfo: (isShow: boolean) => set({ showPlaceInfo: isShow }),
+    showLogin: false,
+    setShowLogin: (isShow: boolean) => set({ showLogin: isShow }),
     showToatst: (msg: string, option: CustomToastOptions) => { toast(msg, option); },
 }));
 
