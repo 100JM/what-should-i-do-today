@@ -17,7 +17,6 @@ const KakaoMap = () => {
     const { mapCenter, setMapCenter, zoomLevel, setZoomLevel, myLocation, setMyLocation, mapObject, setMapObject } = useMapData();
     const { setCategoryPlaceList, resetSelectedPlaceRef, setListTitle } = usePlaceData();
     const { data: session, status } = useSession();
-    console.log(status);
 
     const { loading, error } = useKakaoLoader({
         appkey: process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY || '',

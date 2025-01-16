@@ -16,6 +16,7 @@ import DialogContent from '@mui/material/DialogContent';
 import DialogActions from '@mui/material/DialogActions';
 import { Gallery, Item } from 'react-photoswipe-gallery';
 import 'photoswipe/dist/photoswipe.css';
+import useUserData from '../store/useUserData';
 
 const PlaceInfoDialog = () => {
     const { loading, error } = useKakaoLoader({
@@ -25,6 +26,7 @@ const PlaceInfoDialog = () => {
 
     const { showPlaceInfo, setShowPlaceInfo, showToatst, setShowLogin } = useDialog();
     const { selectedPlace, resetSelectedPlace, selectedPlacePhoto, setSelectedPlacePhoto } = usePlaceData();
+    const { myPlace } = useUserData();
     const { data: session } = useSession();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -75,6 +77,7 @@ const PlaceInfoDialog = () => {
                 const formData = new FormData();
 
                 formData.append('id', selectedPlace.id);
+                formData.append('action', 'add');
 
                 if (session?.userId) {
                     formData.append('userId', session.userId);
@@ -100,10 +103,24 @@ const PlaceInfoDialog = () => {
         }
     };
 
-    const handleDeletePhoto = (name: string) => {
+    const handleDeletePhoto = async (docId: string) => {
         if (confirm('해당 사진을 삭제하시겠습니까?')) {
-            console.log(name);
-            showToatst('삭제되었습니다.', { type: 'success' });
+            const formData = new FormData();
+
+            formData.append('docId', docId);
+            formData.append('action', 'delete');
+
+            try {
+                const deletePhotoResponse = await axios.post('api/place-data-api', formData);
+
+                if (deletePhotoResponse.status === 200) {
+                    fetchPlacePhoto(selectedPlace.id);
+                    showToatst('삭제되었습니다.', { type: 'success' });
+                }
+            } catch (error) {
+                console.log('fetch delete photo Error:', error);
+                showToatst('오류가 발생했습니다.\n새로고침 후 다시 시도해주세요요.', { type: 'error' });
+            }
         } else {
             return;
         }
@@ -130,7 +147,14 @@ const PlaceInfoDialog = () => {
                     <p className="text-[#2391ff] text-xl xxs:text-2xl">{selectedPlace.place_name}</p>
                     <p className="text-sm text-[#868e96] cursor-pointer" ref={addressRef} onClick={() => handleCopyAddress(addressRef.current?.innerText)}>{selectedPlace.road_address_name ? selectedPlace.road_address_name : selectedPlace.address_name}<i className="ri-file-copy-2-line"></i></p>
                 </div>
-                <div>
+                <div className="grid gap-y-1">
+                    <button className="text-2xl text-[#2391ff]">
+                        {myPlace.find((mp) => mp.placeId === selectedPlace.id) ?
+                            <i className="ri-bookmark-fill"></i>
+                            :
+                            <i className="ri-bookmark-line"></i>
+                        }
+                    </button>
                     <button className="text-2xl" onClick={handleClosePlaceInfoDialog}>
                         <i className="ri-close-large-fill"></i>
                     </button>
@@ -140,7 +164,7 @@ const PlaceInfoDialog = () => {
                 <div className="mt-5">
                     {selectedPlacePhoto.length > 0 ?
                         <div>
-                            <input 
+                            <input
                                 type="file"
                                 accept="image/*"
                                 capture="environment"
@@ -148,7 +172,7 @@ const PlaceInfoDialog = () => {
                                 ref={fileInputRef}
                                 multiple
                                 onChange={(e: ChangeEvent<HTMLInputElement>) => handleUploadPhoto(e)}
-                                onClick={(e: React.MouseEvent<HTMLInputElement>) => hadleCheckLogin(e)} 
+                                onClick={(e: React.MouseEvent<HTMLInputElement>) => hadleCheckLogin(e)}
                             />
                             <div className="flex">
                                 <button className="w-[35%] h-52 mr-4 bg-gray-200 rounded-md text-gray-500 text-xs" onClick={handleClickFileInput}>
@@ -164,7 +188,7 @@ const PlaceInfoDialog = () => {
                                                     thumbnail={p.photo}
                                                     width={p.width}
                                                     height={p.height}
-                                                    key={p.name}
+                                                    key={p.docId}
                                                 >
                                                     {({ ref, open }) => (
                                                         <div className="relative flex-none place-img w-[35%] h-[100%]">
@@ -173,12 +197,12 @@ const PlaceInfoDialog = () => {
                                                                 onClick={open}
                                                                 src={p.photo}
                                                                 alt={p.name}
-                                                                layout="fill"
-                                                                objectFit="cover"
+                                                                fill
+                                                                style={{ objectFit: 'cover' }}
                                                                 className="rounded-md cursor-pointer"
                                                             />
                                                             {session?.userId === p.userId &&
-                                                                <i className="ri-close-fill absolute top-1 right-2 text-with-stroke cursor-pointer" onClick={() => handleDeletePhoto(p.name)} ></i>
+                                                                <i className="ri-close-fill absolute top-1 right-2 text-[#2391ff] text-with-stroke cursor-pointer" onClick={() => handleDeletePhoto(p.docId)}></i>
                                                             }
                                                         </div>
                                                     )}

@@ -1,5 +1,6 @@
 import { useState, useRef } from "react";
 import usePlaceData from "../store/usePlaceData"
+import { useSession } from "next-auth/react";
 
 import Rating from '@mui/material/Rating';
 import useDialog from "../store/useDialog";
@@ -11,6 +12,7 @@ const PlaceReview = () => {
     const { selectedPlaceReview, selectedPlace, setSelectedPlaceReview } = usePlaceData();
     const { showToatst } = useDialog();
     const reviewInputRef = useRef<HTMLInputElement>(null);
+    const { data: session } = useSession()
 
     const handleChangeRate = (value: string) => {
         setReviewRate(value);
@@ -29,13 +31,14 @@ const PlaceReview = () => {
 
         try {
             const formData = new FormData();
-            const nowDate = dayjs().format('YYYY-MM-DD HH:mm:ss');
-    
+            const nowDate = dayjs().format('YYYY-MM-DD');
+
             formData.append('id', selectedPlace.id);
             formData.append('review', reviewInputValue);
             formData.append('rate', reviewRate);
             formData.append('date', nowDate);
-    
+            formData.append('action', 'add');
+            if (session?.userId) formData.append('userId', session.userId);
             const response = await axios.post('api/review-data-api', formData);
 
             if (response.status === 200) {
@@ -43,15 +46,46 @@ const PlaceReview = () => {
                     reviewInputRef.current.value = '';
                     const response = await axios.get(`api/review-data-api?id=${selectedPlace.id}`);
                     setSelectedPlaceReview(response.data);
-                    showToatst('리뷰가 등록되었습니다다.', { type: 'success' });
+                    showToatst('리뷰가 등록되었습니다.', { type: 'success' });
+                    setReviewRate('5');
                 } catch (error) {
-                    console.log('fetchPlacePhoto Error:', error);
+                    console.log('fetch review Error:', error);
+                    showToatst('리뷰를 불러오는데 실패했습니다.\n새로고침 후 다시 시도해주세요.', { type: 'error' });
                 }
             }
 
         } catch (error) {
-            console.log('fetch review Error', error);
+            console.log('add review Error', error);
             showToatst('리뷰 등록에 실패했습니다.\n새로고침 후 다시 시도해주세요.', { type: 'error' });
+        }
+    };
+
+    const handleDeleteReview = async (docId: string) => {
+        if (confirm('리뷰를 삭제하시겠습니까?')) {
+            try {
+                const formData = new FormData();
+
+                formData.append('docId', docId);
+                formData.append('action', 'delete');
+
+                const deleteResponse = await axios.post('api/review-data-api', formData);
+
+                if (deleteResponse.status === 200) {
+                    try {
+                        const response = await axios.get(`api/review-data-api?id=${selectedPlace.id}`);
+                        setSelectedPlaceReview(response.data);
+                        showToatst('리뷰가 삭제되었습니다.', { type: 'success' });
+                    } catch (error) {
+                        console.log('fetch review Error:', error);
+                        showToatst('리뷰를 불러오는데 실패했습니다.\n새로고침 후 다시 시도해주세요.', { type: 'error' });
+                    }
+                }
+            } catch (error) {
+                console.log('delete review Error', error);
+                showToatst('리뷰 삭제에 실패했습니다.\n새로고침 후 다시 시도해주세요.', { type: 'error' });
+            }
+        } else {
+            return;
         }
     };
 
@@ -59,9 +93,9 @@ const PlaceReview = () => {
         <div className="w-full overflow-y-auto h-80 lg:w-1/2 lg:ml-2">
             <div>
                 <h3 className="text-gray-500">장소에 대한 의견을 남겨주세요.</h3>
-                <Rating name="size-small" size="small" defaultValue={5} onChange={(e) => handleChangeRate((e.target as HTMLInputElement).value)} />
+                <Rating name="size-small" size="small" defaultValue={5} value={Number(reviewRate)} onChange={(e) => handleChangeRate((e.target as HTMLInputElement).value)} />
                 <div className="w-full flex items-center border-b">
-                    <input 
+                    <input
                         type="text"
                         className="focus:outline-none w-[calc(100%-24px)]"
                         ref={reviewInputRef}
@@ -77,11 +111,16 @@ const PlaceReview = () => {
             {selectedPlaceReview.length > 0 ?
                 <div className="h-[calc(100%-84px)] py-2 flex flex-col gap-2 overflow-y-auto">
                     {selectedPlaceReview.map((r) =>
-                        <div key={`${r.id}_${r.review}`} className="shadow border rounded-md p-2 xs:flex xs:items-center xs:gap-x-2">
+                        <div key={r.docId} className="shadow border rounded-md p-2 xs:flex xs:items-center xs:gap-x-2">
                             <Rating name="size-small" size="small" defaultValue={Number(r.rate)} readOnly />
                             <div>
                                 <p className="text-sm">{r.review}</p>
-                                <p className="text-xs">{dayjs(r.date).format('YYYY-MM-DD')}</p>
+                                <p className="text-xs">
+                                    {r.date}
+                                    {r.userId === session?.userId &&
+                                        <button className="ml-2 text-[#2391ff]" onClick={() => handleDeleteReview(r.docId)}>삭제</button>
+                                    }
+                                </p>
                             </div>
                         </div>
                     )}
