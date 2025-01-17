@@ -40,6 +40,7 @@ const SearchForm = () => {
 
     const handleClickPlace = (place: categoryPlace) => {
         setMapCenter({ lat: Number(place.y), lng: Number(place.x) });
+        mapObject?.setCenter(new kakao.maps.LatLng(Number(place.y), Number(place.x)));
         setZoomLevel(1);
         setSelectedPlace(place);
 

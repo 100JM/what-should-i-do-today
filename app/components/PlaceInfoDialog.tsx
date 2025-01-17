@@ -27,6 +27,7 @@ const PlaceInfoDialog = () => {
     const { showPlaceInfo, setShowPlaceInfo, showToatst, setShowLogin } = useDialog();
     const { selectedPlace, resetSelectedPlace, selectedPlacePhoto, setSelectedPlacePhoto } = usePlaceData();
     const { myPlace } = useUserData();
+    const { setMyPlace } = useUserData();
     const { data: session } = useSession();
 
     const fileInputRef = useRef<HTMLInputElement>(null);
@@ -43,7 +44,7 @@ const PlaceInfoDialog = () => {
 
     const fetchPlacePhoto = async (id: string) => {
         try {
-            const response = await axios.get(`api/place-data-api?id=${id}`);
+            const response = await axios.get(`api/place-data-api?id=${id}&action=getPhoto`);
             setSelectedPlacePhoto(response.data);
         } catch (error) {
             console.log('fetchPlacePhoto Error:', error);
@@ -132,6 +133,66 @@ const PlaceInfoDialog = () => {
         }
     };
 
+    const handleSaveMyPlace = async () => {
+        const formData = new FormData();
+
+        if (!myPlace.find((mp) => mp.placeId === selectedPlace.id)) {
+            if (session?.userId) formData.append('userId', session.userId);
+            formData.append('placeId', selectedPlace.id);
+            formData.append('placeName', selectedPlace.place_name);
+            formData.append('address', selectedPlace.address_name);
+            formData.append('roadAddress', selectedPlace.road_address_name);
+            formData.append('category', selectedPlace.category_name);
+            formData.append('x', selectedPlace.x);
+            formData.append('y', selectedPlace.y);
+            formData.append('action', 'myPlace');
+
+            try {
+                const saveMyPlaceResponse = await axios.post('api/place-data-api', formData);
+
+                if (saveMyPlaceResponse.status === 200) {
+                    if (session?.userId) {
+                        try {
+                            const response = await axios.get(`api/place-data-api?userId=${session.userId}&action=getMyPlace`);
+
+                            setMyPlace(response.data);
+                        } catch (error) {
+                            console.log('fetch my place Error:', error);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log('fetch save my place Error:', error);
+                showToatst('오류가 발생했습니다.\n새로고침 후 다시 시도해주세요요.', { type: 'error' });
+            }
+        } else {
+            const docId = myPlace.find((mp) => mp.placeId === selectedPlace.id)?.docId;
+            formData.append('docId', docId as string);
+            formData.append('action', 'deleteMyPlace');
+
+            try {
+                const saveMyPlaceResponse = await axios.post('api/place-data-api', formData);
+
+                if (saveMyPlaceResponse.status === 200) {
+                    if (session?.userId) {
+                        try {
+                            const response = await axios.get(`api/place-data-api?userId=${session.userId}&action=getMyPlace`);
+
+                            setMyPlace(response.data);
+                        } catch (error) {
+                            console.log('fetch my place Error:', error);
+                        }
+                    }
+                }
+            } catch (error) {
+                console.log('fetch delete my place Error:', error);
+                showToatst('오류가 발생했습니다.\n새로고침 후 다시 시도해주세요요.', { type: 'error' });
+            }
+
+        }
+
+    };
+
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error loading map: {error.message}</div>;
 
@@ -145,10 +206,17 @@ const PlaceInfoDialog = () => {
                 <div>
                     <p className="text-xs">{selectedPlace.category_name}</p>
                     <p className="text-[#2391ff] text-xl xxs:text-2xl">{selectedPlace.place_name}</p>
-                    <p className="text-sm text-[#868e96] cursor-pointer" ref={addressRef} onClick={() => handleCopyAddress(addressRef.current?.innerText)}>{selectedPlace.road_address_name ? selectedPlace.road_address_name : selectedPlace.address_name}<i className="ri-file-copy-2-line"></i></p>
+                    <p
+                        className="text-sm text-[#868e96] cursor-pointer"
+                        ref={addressRef}
+                        onClick={() => handleCopyAddress(addressRef.current?.innerText)}
+                    >
+                        {selectedPlace.road_address_name ? selectedPlace.road_address_name : selectedPlace.address_name}
+                        <i className="ri-file-copy-2-line"></i>
+                    </p>
                 </div>
                 <div className="grid gap-y-1">
-                    <button className="text-2xl text-[#2391ff]">
+                    <button className="text-2xl text-[#2391ff]" onClick={handleSaveMyPlace}>
                         {myPlace.find((mp) => mp.placeId === selectedPlace.id) ?
                             <i className="ri-bookmark-fill"></i>
                             :

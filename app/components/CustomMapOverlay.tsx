@@ -36,7 +36,7 @@ const CustomMapOverlay = () => {
 
     const fetchPlacePhoto = async (id: string) => {
         try {
-            const response = await axios.get(`api/place-data-api?id=${id}`);
+            const response = await axios.get(`api/place-data-api?id=${id}&action=getPhoto`);
             setSelectedPlacePhoto(response.data);
         } catch (error) {
             console.log('fetchPlacePhoto Error:', error);

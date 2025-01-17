@@ -23,7 +23,10 @@ export interface placePhoto {
 export interface savedPlace {
     docId: string;
     placeId: string;
+    placeName: string;
     address: string;
     roadAddress: string;
     category: string;
+    x: string;
+    y: string;
 }

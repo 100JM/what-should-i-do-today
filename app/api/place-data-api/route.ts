@@ -14,31 +14,51 @@ interface placePhoto {
 }
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
-    const id = request.nextUrl.searchParams.get('id');
+    const action = request.nextUrl.searchParams.get('action');
 
-    if (!id) {
-        return NextResponse.json({ error: 'place id is required' }, { status: 200 });
-    }
+    if (action === 'getPhoto') {
+        const id = request.nextUrl.searchParams.get('id');
 
-    try {
-        const collectionRef = collection(db, 'place_photo');
-        const q = query(collectionRef, where('id', '==', id));
-        const querySnapshot = await getDocs(q);
-        const docs = querySnapshot.docs.map(doc => ({
-            docId: doc.id,
-            ...(doc.data() as placePhoto),
-        }));
+        if (!id) {
+            return NextResponse.json({ error: 'place id is required' }, { status: 200 });
+        }
 
-        const sortDocs = docs.sort((a, b) => {
-            const aDate = a.createdAt.toDate().getTime();
-            const bDate = b.createdAt.toDate().getTime();
+        try {
+            const collectionRef = collection(db, 'place_photo');
+            const q = query(collectionRef, where('id', '==', id));
+            const querySnapshot = await getDocs(q);
+            const docs = querySnapshot.docs.map(doc => ({
+                docId: doc.id,
+                ...(doc.data() as placePhoto),
+            }));
+    
+            const sortDocs = docs.sort((a, b) => {
+                const aDate = a.createdAt.toDate().getTime();
+                const bDate = b.createdAt.toDate().getTime();
+    
+                return bDate - aDate;
+            });
+    
+            return NextResponse.json(sortDocs);
+        } catch (error) {
+            return NextResponse.json({ error: error }, { status: 500 });
+        }
+    } else {
+        try {
+            const userId = request.nextUrl.searchParams.get('userId');
 
-            return bDate - aDate;
-        });
+            const collectionRef = collection(db, 'my_place');
+            const q = query(collectionRef, where('userId', '==', userId));
+            const querySnapshot = await getDocs(q);
+            const docs = querySnapshot.docs.map(doc => ({
+                docId: doc.id,
+                ...doc.data(),
+            }));
 
-        return NextResponse.json(sortDocs);
-    } catch (error) {
-        return NextResponse.json({ error: error }, { status: 500 });
+            return NextResponse.json(docs);
+        } catch (error) {
+            return NextResponse.json({ error: error }, { status: 500 });
+        }
     }
 };
 
@@ -84,7 +104,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         } catch (error) {
             return NextResponse.json({ error: error }, { status: 500 });
         }
-    } else {
+    } else if (action === 'delete') {
         const docId = formData.get('docId');
 
         if (typeof docId !== 'string' || !docId) {
@@ -99,6 +119,48 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         } catch (error) {
             return NextResponse.json({ error: error }, { status: 500 });
         }
-    }
+    } else if (action === 'myPlace') {
+        const placeId = formData.get('placeId');
+        const placeName = formData.get('placeName');
+        const address = formData.get('address');
+        const roadAddress = formData.get('roadAddress');
+        const category = formData.get('category');
+        const userId = formData.get('userId');
+        const x = formData.get('x');
+        const y = formData.get('y');
 
+        const data = {
+            placeId: placeId,
+            placeName: placeName,
+            address: address,
+            roadAddress: roadAddress,
+            category: category,
+            userId: userId,
+            x: x,
+            y: y
+        };
+
+        try {
+            await addDoc(collection(db, 'my_place'), data);
+
+            return NextResponse.json({ status: 200 });
+        } catch (error) {
+            return NextResponse.json({ error: error }, { status: 500 });
+        }
+    } else {
+        const docId = formData.get('docId');
+
+        if (typeof docId !== 'string' || !docId) {
+            return NextResponse.json({ error: 'doc id is required' }, { status: 200 });
+        }
+
+        try {
+            const docRef = doc(db, 'my_place', docId);
+            await deleteDoc(docRef);
+
+            return NextResponse.json({ status: 200 });
+        } catch (error) {
+            return NextResponse.json({ error: error }, { status: 500 });
+        }
+    }
 };

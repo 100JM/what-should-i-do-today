@@ -11,11 +11,13 @@ import useDialog from '../store/useDialog';
 import { Map, MapMarker, useKakaoLoader } from 'react-kakao-maps-sdk'
 import CustomMapOverlay from './CustomMapOverlay';
 import PlaceInfoDialog from './PlaceInfoDialog';
+import useUserData from '../store/useUserData';
 
 const KakaoMap = () => {
     const { showPlaceInfo, setShowLogin } = useDialog();
     const { mapCenter, setMapCenter, zoomLevel, setZoomLevel, myLocation, setMyLocation, mapObject, setMapObject } = useMapData();
     const { setCategoryPlaceList, resetSelectedPlaceRef, setListTitle } = usePlaceData();
+    const { setMyPlace } = useUserData();
     const { data: session, status } = useSession();
 
     const { loading, error } = useKakaoLoader({
@@ -33,6 +35,18 @@ const KakaoMap = () => {
             }
         } catch (error) {
             console.log('fetchCategory Error:', error);
+        }
+    };
+
+    const handleGetMyPlace = async () => {
+        if (session?.userId) {
+            try {
+                const response = await axios.get(`api/place-data-api?userId=${session.userId}&action=getMyPlace`);
+
+                setMyPlace(response.data);
+            } catch (error) {
+                console.log('fetch my place Error:', error);
+            }
         }
     };
 
@@ -77,6 +91,10 @@ const KakaoMap = () => {
     useEffect(() => {
         initMapEvt();
     }, []);
+
+    useEffect(() => {
+        handleGetMyPlace();
+    }, [session]);
 
     if (loading) return <div>Loading...</div>;
     if (error) return <div>Error loading map: {error.message}</div>;
