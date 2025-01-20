@@ -11,6 +11,8 @@ interface useDialogInterface {
     showLogin: boolean;
     setShowLogin: (isShow: boolean) => void;
     showToatst: (msg: string, option: CustomToastOptions) => void;
+    showLoading: boolean;
+    setShowLoading: (isShow: boolean) => void;
 }
 
 const useDialog = create<useDialogInterface>((set) => ({
@@ -19,6 +21,8 @@ const useDialog = create<useDialogInterface>((set) => ({
     showLogin: false,
     setShowLogin: (isShow: boolean) => set({ showLogin: isShow }),
     showToatst: (msg: string, option: CustomToastOptions) => { toast(msg, option); },
+    showLoading: false,
+    setShowLoading: (isShow: boolean) => set({ showLoading: isShow }),
 }));
 
 export default useDialog;

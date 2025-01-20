@@ -60,6 +60,8 @@ const SearchForm = () => {
         resetSelectedPlaceRef();
         setClickedButton('');
 
+        searchInputRef.current?.blur();
+
         try {
             if (searchInputRef.current?.value) {
 

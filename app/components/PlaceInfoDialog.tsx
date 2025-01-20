@@ -9,6 +9,7 @@ import useDialog from '../store/useDialog';
 import usePlaceData from '../store/usePlaceData';
 import { resizeImg } from '../utils/resizeImg';
 
+import Loading from './Loading';
 import PlaceReview from './PlaceReview';
 import Dialog from '@mui/material/Dialog';
 import DialogTitle from '@mui/material/DialogTitle';
@@ -24,7 +25,7 @@ const PlaceInfoDialog = () => {
         libraries: ['services'],
     }) as unknown as { loading: boolean; error: ErrorEvent | undefined };
 
-    const { showPlaceInfo, setShowPlaceInfo, showToatst, setShowLogin } = useDialog();
+    const { showPlaceInfo, setShowPlaceInfo, showToatst, setShowLogin, showLoading, setShowLoading } = useDialog();
     const { selectedPlace, resetSelectedPlace, selectedPlacePhoto, setSelectedPlacePhoto } = usePlaceData();
     const { myPlace } = useUserData();
     const { setMyPlace } = useUserData();
@@ -71,6 +72,8 @@ const PlaceInfoDialog = () => {
                 showToatst('이미지 파일만 선택해주세요.', { type: 'error' });
                 return;
             } else {
+                setShowLoading(true);
+
                 const resizeList = await Promise.all(
                     fileList.map(async (f) => await resizeImg(f, `${selectedPlace.id}_${f.name}_${dayjs().format('HH:mm:ss')}`))
                 );
@@ -79,10 +82,7 @@ const PlaceInfoDialog = () => {
 
                 formData.append('id', selectedPlace.id);
                 formData.append('action', 'add');
-
-                if (session?.userId) {
-                    formData.append('userId', session.userId);
-                }
+                if (session?.userId) formData.append('userId', session.userId);
 
                 resizeList.forEach((rf) => {
                     formData.append(`file[]`, rf.file);
@@ -98,6 +98,8 @@ const PlaceInfoDialog = () => {
                     }
                 } catch (error) {
                     console.log('fetch add photo Error:', error);
+                } finally {
+                    setShowLoading(false);
                 }
 
             }
@@ -134,10 +136,16 @@ const PlaceInfoDialog = () => {
     };
 
     const handleSaveMyPlace = async () => {
+        if (!session?.userId) {
+            setShowLogin(true);
+            return;
+        }
+
         const formData = new FormData();
+        setShowLoading(true);
 
         if (!myPlace.find((mp) => mp.placeId === selectedPlace.id)) {
-            if (session?.userId) formData.append('userId', session.userId);
+            formData.append('userId', session.userId);
             formData.append('placeId', selectedPlace.id);
             formData.append('placeName', selectedPlace.place_name);
             formData.append('address', selectedPlace.address_name);
@@ -164,6 +172,8 @@ const PlaceInfoDialog = () => {
             } catch (error) {
                 console.log('fetch save my place Error:', error);
                 showToatst('오류가 발생했습니다.\n새로고침 후 다시 시도해주세요요.', { type: 'error' });
+            } finally {
+                setShowLoading(false);
             }
         } else {
             const docId = myPlace.find((mp) => mp.placeId === selectedPlace.id)?.docId;
@@ -187,10 +197,10 @@ const PlaceInfoDialog = () => {
             } catch (error) {
                 console.log('fetch delete my place Error:', error);
                 showToatst('오류가 발생했습니다.\n새로고침 후 다시 시도해주세요요.', { type: 'error' });
+            } finally {
+                setShowLoading(false);
             }
-
         }
-
     };
 
     if (loading) return <div>Loading...</div>;
@@ -325,6 +335,7 @@ const PlaceInfoDialog = () => {
                     <i className="ri-road-map-line ml-2"></i>
                 </a>
             </DialogActions>
+            {showLoading && <Loading />}
         </Dialog>
     )
 };

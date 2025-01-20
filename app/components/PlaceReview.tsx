@@ -10,7 +10,7 @@ import axios from "axios";
 const PlaceReview = () => {
     const [reviewRate, setReviewRate] = useState<string>('5');
     const { selectedPlaceReview, selectedPlace, setSelectedPlaceReview } = usePlaceData();
-    const { showToatst } = useDialog();
+    const { showToatst, setShowLogin, setShowLoading } = useDialog();
     const reviewInputRef = useRef<HTMLInputElement>(null);
     const { data: session } = useSession()
 
@@ -23,6 +23,11 @@ const PlaceReview = () => {
 
         reviewInputRef.current?.blur();
 
+        if (!session?.userId) {
+            setShowLogin(true);
+            return;
+        }
+
         if (!reviewInputValue) {
             showToatst('리뷰 내용을 작성해주세요.', { type: 'error' });
             reviewInputRef.current?.focus();
@@ -30,6 +35,8 @@ const PlaceReview = () => {
         }
 
         try {
+            setShowLoading(true);
+
             const formData = new FormData();
             const nowDate = dayjs().format('YYYY-MM-DD');
 
@@ -38,7 +45,7 @@ const PlaceReview = () => {
             formData.append('rate', reviewRate);
             formData.append('date', nowDate);
             formData.append('action', 'add');
-            if (session?.userId) formData.append('userId', session.userId);
+            formData.append('userId', session.userId);
             const response = await axios.post('api/review-data-api', formData);
 
             if (response.status === 200) {
@@ -57,6 +64,8 @@ const PlaceReview = () => {
         } catch (error) {
             console.log('add review Error', error);
             showToatst('리뷰 등록에 실패했습니다.\n새로고침 후 다시 시도해주세요.', { type: 'error' });
+        } finally {
+            setShowLoading(false);
         }
     };
 
