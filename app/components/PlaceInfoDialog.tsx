@@ -245,7 +245,6 @@ const PlaceInfoDialog = () => {
                             <input
                                 type="file"
                                 accept="image/*"
-                                capture="environment"
                                 className="hidden"
                                 ref={fileInputRef}
                                 multiple
