@@ -12,9 +12,46 @@ const gothicA1 = Gothic_A1({
   weight: "400"
 });
 
+// export const metadata: Metadata = {
+//   title: "오늘 뭐 하지?",
+//   description: "What should i do today?",
+// };
+
 export const metadata: Metadata = {
   title: "오늘 뭐 하지?",
-  description: "What should i do today?",
+  description: "내 주변 가볼만한 장소를 찾아보세요.",
+  keywords: ['map', 'place', '핫플', '지도', '맛집', '명소', '갈만한 곳', '관광광' ],
+  openGraph: {
+    title: '오늘 뭐 하지?',
+    description: "내 주변 가볼만한 장소를 찾아보세요.",
+    images: [
+      {
+        url: 'https://what-should-i-do-today.vercel.app/images/openGraph_image.jpg',
+        alt: 'main_logo',
+        width: 1200,
+        height: 630,
+      },
+    ],
+    locale: 'ko_KR',
+    type: 'website',
+    url: 'https://what-should-i-do-today.vercel.app/',
+    siteName: '100LOG'
+  },
+  twitter: {
+    title: "오늘 뭐 하지?",
+    description: "내 주변 가볼만한 장소를 찾아보세요.",
+    images: [
+      {
+        url: 'https://what-should-i-do-today.vercel.app/images/openGraph_image.jpg',
+        alt: 'main_logo',
+        width: 1200,
+        height: 630,
+      },
+    ],
+  },
+  alternates: {
+    canonical: 'https://what-should-i-do-today.vercel.app/',
+  }
 };
 
 export default function RootLayout({
