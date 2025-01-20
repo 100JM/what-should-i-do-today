@@ -247,10 +247,8 @@ const PlaceInfoDialog = () => {
                                 accept="image/*"
                                 className="hidden"
                                 ref={fileInputRef}
-                                multiple
                                 onChange={(e: ChangeEvent<HTMLInputElement>) => handleUploadPhoto(e)}
                                 onClick={(e: React.MouseEvent<HTMLInputElement>) => hadleCheckLogin(e)}
-                                capture={undefined}
                             />
                             <div className="flex">
                                 <button className="w-[35%] h-52 mr-4 bg-gray-200 rounded-md text-gray-500 text-xs" onClick={handleClickFileInput}>
