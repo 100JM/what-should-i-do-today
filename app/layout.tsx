@@ -26,7 +26,7 @@ export const metadata: Metadata = {
     description: "내 주변 가볼만한 장소를 찾아보세요.",
     images: [
       {
-        url: 'https://what-should-i-do-today.vercel.app/images/openGraph_image.jpg',
+        url: 'https://what-should-i-do-today.vercel.app/images/openGraph_image.png',
         alt: 'main_logo',
         width: 1200,
         height: 630,
@@ -42,7 +42,7 @@ export const metadata: Metadata = {
     description: "내 주변 가볼만한 장소를 찾아보세요.",
     images: [
       {
-        url: 'https://what-should-i-do-today.vercel.app/images/openGraph_image.jpg',
+        url: 'https://what-should-i-do-today.vercel.app/images/openGraph_image.png',
         alt: 'main_logo',
         width: 1200,
         height: 630,
