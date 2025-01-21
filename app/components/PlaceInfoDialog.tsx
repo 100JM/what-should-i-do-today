@@ -81,7 +81,7 @@ const PlaceInfoDialog = () => {
                 const formData = new FormData();
 
                 formData.append('id', selectedPlace.id);
-                formData.append('action', 'add');
+                formData.append('action', 'photo');
                 if (session?.userId) formData.append('userId', session.userId);
 
                 resizeList.forEach((rf) => {
@@ -108,13 +108,10 @@ const PlaceInfoDialog = () => {
 
     const handleDeletePhoto = async (docId: string) => {
         if (confirm('해당 사진을 삭제하시겠습니까?')) {
-            const formData = new FormData();
-
-            formData.append('docId', docId);
-            formData.append('action', 'delete');
-
             try {
-                const deletePhotoResponse = await axios.post('api/place-data-api', formData);
+                const deletePhotoResponse = await axios.delete('api/place-data-api', {
+                    data: { docId, action: 'deletePhoto'}
+                });
 
                 if (deletePhotoResponse.status === 200) {
                     fetchPlacePhoto(selectedPlace.id);
@@ -177,11 +174,11 @@ const PlaceInfoDialog = () => {
             }
         } else {
             const docId = myPlace.find((mp) => mp.placeId === selectedPlace.id)?.docId;
-            formData.append('docId', docId as string);
-            formData.append('action', 'deleteMyPlace');
 
             try {
-                const saveMyPlaceResponse = await axios.post('api/place-data-api', formData);
+                const saveMyPlaceResponse = await axios.delete('api/place-data-api', {
+                    data: { docId, action: 'deleteMyPlace'}
+                });
 
                 if (saveMyPlaceResponse.status === 200) {
                     if (session?.userId) {

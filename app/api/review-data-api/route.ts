@@ -42,33 +42,33 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
     const formData = await request.formData();
-    const action = formData.get('action');
 
-    if (action === 'add') {
-        try {
-            const reviewData = Object.fromEntries(formData.entries());
-            const data = Object.assign(reviewData, { createdAt: serverTimestamp() });
+    try {
+        const reviewData = Object.fromEntries(formData.entries());
+        const data = Object.assign(reviewData, { createdAt: serverTimestamp() });
+
+        await addDoc(collection(db, 'place_review'), data);
     
-            await addDoc(collection(db, 'place_review'), data);
-        
-            return NextResponse.json({ status: 200 });
-        } catch (error) {
-            return NextResponse.json({ error: error }, { status: 500 });
-        }
-    } else {
-        const docId = formData.get('docId');
+        return NextResponse.json({ status: 200 });
+    } catch (error) {
+        return NextResponse.json({ error: error }, { status: 500 });
+    }
+};
 
-        if (typeof docId !== 'string' || !docId) {
-            return NextResponse.json({ error: 'doc id is required' }, { status: 200 });
-        }
+export async function DELETE(request: NextRequest): Promise<NextResponse> {
+    const body = await request.json();
+    const { docId } = body;
 
-        try {
-            const docRef = doc(db, 'place_review', docId);
-            await deleteDoc(docRef);
+    if (typeof docId !== 'string' || !docId) {
+        return NextResponse.json({ error: 'doc id is required' }, { status: 200 });
+    }
 
-            return NextResponse.json({ status: 200 });
-        } catch (error) {
-            return NextResponse.json({ error: error }, { status: 500 });
-        }
+    try {
+        const docRef = doc(db, 'place_review', docId);
+        await deleteDoc(docRef);
+
+        return NextResponse.json({ status: 200 });
+    } catch (error) {
+        return NextResponse.json({ error: error }, { status: 500 });
     }
 };

@@ -66,7 +66,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     const formData = await request.formData();
     const action = formData.get('action');
 
-    if (action === 'add') {
+    if (action === 'photo') {
         const placeId = formData.get('id');
         const files = formData.getAll('file[]');
         const widths = formData.getAll('width[]');
@@ -104,22 +104,7 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         } catch (error) {
             return NextResponse.json({ error: error }, { status: 500 });
         }
-    } else if (action === 'delete') {
-        const docId = formData.get('docId');
-
-        if (typeof docId !== 'string' || !docId) {
-            return NextResponse.json({ error: 'doc id is required' }, { status: 200 });
-        }
-
-        try {
-            const docRef = doc(db, 'place_photo', docId);
-            await deleteDoc(docRef);
-
-            return NextResponse.json({ status: 200 });
-        } catch (error) {
-            return NextResponse.json({ error: error }, { status: 500 });
-        }
-    } else if (action === 'myPlace') {
+    } else {
         const placeId = formData.get('placeId');
         const placeName = formData.get('placeName');
         const address = formData.get('address');
@@ -147,13 +132,27 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         } catch (error) {
             return NextResponse.json({ error: error }, { status: 500 });
         }
-    } else {
-        const docId = formData.get('docId');
+    }
+};
 
-        if (typeof docId !== 'string' || !docId) {
-            return NextResponse.json({ error: 'doc id is required' }, { status: 200 });
+export async function DELETE(request: NextRequest): Promise<NextResponse> {
+    const body = await request.json();
+    const { docId, action } = body;
+
+    if (typeof docId !== 'string' || !docId) {
+        return NextResponse.json({ error: 'doc id is required' }, { status: 200 });
+    }
+
+    if (action === 'deletePhoto') {
+        try {
+            const docRef = doc(db, 'place_photo', docId);
+            await deleteDoc(docRef);
+
+            return NextResponse.json({ status: 200 });
+        } catch (error) {
+            return NextResponse.json({ error: error }, { status: 500 });
         }
-
+    } else {
         try {
             const docRef = doc(db, 'my_place', docId);
             await deleteDoc(docRef);

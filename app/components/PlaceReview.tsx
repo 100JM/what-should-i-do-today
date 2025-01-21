@@ -44,7 +44,6 @@ const PlaceReview = () => {
             formData.append('review', reviewInputValue);
             formData.append('rate', reviewRate);
             formData.append('date', nowDate);
-            formData.append('action', 'add');
             formData.append('userId', session.userId);
             const response = await axios.post('api/review-data-api', formData);
 
@@ -72,12 +71,9 @@ const PlaceReview = () => {
     const handleDeleteReview = async (docId: string) => {
         if (confirm('리뷰를 삭제하시겠습니까?')) {
             try {
-                const formData = new FormData();
-
-                formData.append('docId', docId);
-                formData.append('action', 'delete');
-
-                const deleteResponse = await axios.post('api/review-data-api', formData);
+                const deleteResponse = await axios.delete('api/review-data-api', {
+                    data: { docId }
+                });
 
                 if (deleteResponse.status === 200) {
                     try {
