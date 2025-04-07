@@ -1,5 +1,5 @@
 import Image from 'next/image';
-import { ChangeEvent, useRef } from 'react';
+import { ChangeEvent, useRef, useEffect, useState } from 'react';
 import { useSession } from 'next-auth/react';
 import { Map, MapMarker, useKakaoLoader } from 'react-kakao-maps-sdk'
 import axios from 'axios';
@@ -19,6 +19,8 @@ import { Gallery, Item } from 'react-photoswipe-gallery';
 import 'photoswipe/dist/photoswipe.css';
 import useUserData from '../store/useUserData';
 
+import loadingImg from "../assets/images/icon-32x32.png";
+
 const PlaceInfoDialog = () => {
     const { loading, error } = useKakaoLoader({
         appkey: process.env.NEXT_PUBLIC_KAKAO_MAP_API_KEY || '',
@@ -34,9 +36,23 @@ const PlaceInfoDialog = () => {
     const fileInputRef = useRef<HTMLInputElement>(null);
     const addressRef = useRef<HTMLParagraphElement>(null);
 
+    const [dialogLoading, setDialogLoading] = useState<boolean>(false);
+
+    useEffect(() => {
+        if (showPlaceInfo) {
+            setDialogLoading(true);
+
+            const timer = setTimeout(() => {
+                setDialogLoading(false);
+            }, 1000);
+
+            return () => clearTimeout(timer);
+        }
+    }, [showPlaceInfo]);
+
     const handleClosePlaceInfoDialog = () => {
-        setShowPlaceInfo(false)
         resetSelectedPlace();
+        setShowPlaceInfo(false)
     };
 
     const handleClickFileInput = () => {
@@ -110,7 +126,7 @@ const PlaceInfoDialog = () => {
         if (confirm('해당 사진을 삭제하시겠습니까?')) {
             try {
                 const deletePhotoResponse = await axios.delete('api/place-data-api', {
-                    data: { docId, action: 'deletePhoto'}
+                    data: { docId, action: 'deletePhoto' }
                 });
 
                 if (deletePhotoResponse.status === 200) {
@@ -177,7 +193,7 @@ const PlaceInfoDialog = () => {
 
             try {
                 const saveMyPlaceResponse = await axios.delete('api/place-data-api', {
-                    data: { docId, action: 'deleteMyPlace'}
+                    data: { docId, action: 'deleteMyPlace' }
                 });
 
                 if (saveMyPlaceResponse.status === 200) {
@@ -235,91 +251,102 @@ const PlaceInfoDialog = () => {
                     </button>
                 </div>
             </DialogTitle>
-            <DialogContent className="border-b">
-                <div className="mt-5">
-                    {selectedPlacePhoto.length > 0 ?
-                        <div>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                ref={fileInputRef}
-                                multiple
-                                onChange={(e: ChangeEvent<HTMLInputElement>) => handleUploadPhoto(e)}
-                                onClick={(e: React.MouseEvent<HTMLInputElement>) => hadleCheckLogin(e)}
-                            />
-                            <div className="flex">
-                                <button className="w-[35%] h-52 mr-4 bg-gray-200 rounded-md text-gray-500 text-xs" onClick={handleClickFileInput}>
-                                    <p>사진 업로드</p>
-                                    <i className="ri-image-add-fill"></i>
-                                </button>
-                                <div className="flex w-[65%] h-52 overflow-x-auto place-img-div">
-                                    <Gallery>
-                                        {selectedPlacePhoto.map((p) => {
-                                            return (
-                                                <Item
-                                                    original={p.photo}
-                                                    thumbnail={p.photo}
-                                                    width={p.width}
-                                                    height={p.height}
-                                                    key={p.docId}
-                                                >
-                                                    {({ ref, open }) => (
-                                                        <div className="relative flex-none place-img w-[35%] h-[100%]">
-                                                            <Image
-                                                                ref={ref}
-                                                                onClick={open}
-                                                                src={p.photo}
-                                                                alt={p.name}
-                                                                fill
-                                                                style={{ objectFit: 'cover' }}
-                                                                className="rounded-md cursor-pointer"
-                                                            />
-                                                            {session?.userId === p.userId &&
-                                                                <i className="ri-close-fill absolute top-1 right-2 text-[#2391ff] text-with-stroke cursor-pointer" onClick={() => handleDeletePhoto(p.docId)}></i>
-                                                            }
-                                                        </div>
-                                                    )}
-                                                </Item>
-                                            )
-                                        })}
-                                    </Gallery>
-                                </div>
+            {!dialogLoading ?
+                <>
+                    <DialogContent className="border-b">
+                        <div className="mt-5">
+                            {
+                                selectedPlacePhoto.length > 0 ?
+                                    <div>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            ref={fileInputRef}
+                                            multiple
+                                            onChange={(e: ChangeEvent<HTMLInputElement>) => handleUploadPhoto(e)}
+                                            onClick={(e: React.MouseEvent<HTMLInputElement>) => hadleCheckLogin(e)}
+                                        />
+                                        <div className="flex">
+                                            <button className="w-[35%] h-52 mr-4 bg-gray-200 rounded-md text-gray-500 text-xs" onClick={handleClickFileInput}>
+                                                <p>사진 업로드</p>
+                                                <i className="ri-image-add-fill"></i>
+                                            </button>
+                                            <div className="flex w-[65%] h-52 overflow-x-auto place-img-div">
+                                                <Gallery>
+                                                    {selectedPlacePhoto.map((p) => {
+                                                        return (
+                                                            <Item
+                                                                original={p.photo}
+                                                                thumbnail={p.photo}
+                                                                width={p.width}
+                                                                height={p.height}
+                                                                key={p.docId}
+                                                            >
+                                                                {({ ref, open }) => (
+                                                                    <div className="relative flex-none place-img w-[35%] h-[100%]">
+                                                                        <Image
+                                                                            ref={ref}
+                                                                            onClick={open}
+                                                                            src={p.photo}
+                                                                            alt={p.name}
+                                                                            fill
+                                                                            style={{ objectFit: 'cover' }}
+                                                                            className="rounded-md cursor-pointer"
+                                                                        />
+                                                                        {session?.userId === p.userId &&
+                                                                            <i className="ri-close-fill absolute top-1 right-2 text-[#2391ff] text-with-stroke cursor-pointer" onClick={() => handleDeletePhoto(p.docId)}></i>
+                                                                        }
+                                                                    </div>
+                                                                )}
+                                                            </Item>
+                                                        )
+                                                    })}
+                                                </Gallery>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    :
+                                    <div>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            ref={fileInputRef}
+                                            multiple
+                                            onChange={(e: ChangeEvent<HTMLInputElement>) => handleUploadPhoto(e)}
+                                            onClick={(e: React.MouseEvent<HTMLInputElement>) => hadleCheckLogin(e)}
+                                        />
+                                        <button className="w-full h-52 bg-gray-200 rounded-md text-gray-500 text-xs xxs:text-base" onClick={handleClickFileInput}>
+                                            <p>장소와 연관된 사진을 업로드할 수 있어요.</p>
+                                            <i className="ri-image-add-fill"></i>
+                                        </button>
+                                    </div>
+                            }
+                        </div>
+                        <div className="place-info mt-5 flex justify-center">
+                            <div className="w-full mb-6 lg:w-1/2 lg:mr-2 lg:mb-0">
+                                <Map
+                                    center={{ lat: Number(selectedPlace.y), lng: Number(selectedPlace.x) }}
+                                    className="w-full h-80 rounded-md shadow-lg shadow-gray-300"
+                                    level={2}
+                                    zoomable={false}
+                                    draggable={false}
+                                >
+                                    <MapMarker position={{ lat: Number(selectedPlace.y), lng: Number(selectedPlace.x) }} />
+                                </Map>
                             </div>
+                            <PlaceReview />
                         </div>
-                        :
-                        <div>
-                            <input
-                                type="file"
-                                accept="image/*"
-                                className="hidden"
-                                ref={fileInputRef}
-                                multiple
-                                onChange={(e: ChangeEvent<HTMLInputElement>) => handleUploadPhoto(e)}
-                                onClick={(e: React.MouseEvent<HTMLInputElement>) => hadleCheckLogin(e)}
-                            />
-                            <button className="w-full h-52 bg-gray-200 rounded-md text-gray-500 text-xs xxs:text-base" onClick={handleClickFileInput}>
-                                <p>장소와 연관된 사진을 업로드할 수 있어요.</p>
-                                <i className="ri-image-add-fill"></i>
-                            </button>
-                        </div>
-                    }
-                </div>
-                <div className="place-info mt-5 flex justify-center">
-                    <div className="w-full mb-6 lg:w-1/2 lg:mr-2 lg:mb-0">
-                        <Map
-                            center={{ lat: Number(selectedPlace.y), lng: Number(selectedPlace.x) }}
-                            className="w-full h-80 rounded-md shadow-lg shadow-gray-300"
-                            level={2}
-                            zoomable={false}
-                            draggable={false}
-                        >
-                            <MapMarker position={{ lat: Number(selectedPlace.y), lng: Number(selectedPlace.x) }} />
-                        </Map>
+                    </DialogContent>
+                </>
+                :
+                <DialogContent>
+                    <div className="flex justify-center items-center h-[560px]">
+                        <Image src={loadingImg} alt="loading_img" width={32} height={32} className="animate-spin" />
                     </div>
-                    <PlaceReview />
-                </div>
-            </DialogContent>
+                </DialogContent>
+            }
             <DialogActions>
                 <a href={selectedPlace.place_url} target="_blank" className="bg-[#2391ff] rounded-md text-white p-2 w-1/2 mr-1 text-center text-[10px] xs:text-base xxs:text-xs">
                     <span>카카오 지도에서 보기</span>

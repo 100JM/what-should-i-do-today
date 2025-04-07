@@ -24,10 +24,12 @@ const CustomMapOverlay = () => {
         setZoomLevel(1);
         setSelectedPlace(place);
         
+        setShowPlaceInfo(true);
+
         await Promise.all([
             fetchPlacePhoto(place.id),
             fetchPlaceReview(place.id)
-        ]).then(() => setShowPlaceInfo(true));
+        ]);
 
         if (selectedPlaceRef[place.id]) {
             selectedPlaceRef[place.id]?.scrollIntoView({ behavior: 'smooth', block: 'center' });
