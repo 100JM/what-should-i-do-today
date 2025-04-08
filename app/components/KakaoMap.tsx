@@ -16,7 +16,7 @@ import ReSearchButton from './ReSearchButton';
 
 const KakaoMap = () => {
     const { showPlaceInfo, setShowLogin } = useDialog();
-    const { mapCenter, setMapCenter, zoomLevel, setZoomLevel, myLocation, setMyLocation, mapObject, setMapObject, showReSearchBtn, setShowReSearchBtn } = useMapData();
+    const { mapCenter, setMapCenter, zoomLevel, setZoomLevel, myLocation, setMyLocation, mapObject, setMapObject, showReSearchBtn } = useMapData();
     const { setCategoryPlaceList, resetSelectedPlaceRef, setListTitle } = usePlaceData();
     const { setMyPlace } = useUserData();
     const { data: session, status } = useSession();
