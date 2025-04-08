@@ -1,6 +1,5 @@
 import { CustomOverlayMap } from 'react-kakao-maps-sdk'
 import { categoryPlace } from '@/types/categoryData';
-import axios from 'axios';
 
 import useDialog from '../store/useDialog';
 import usePlaceData from '../store/usePlaceData';
