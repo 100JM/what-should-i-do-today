@@ -7,6 +7,8 @@ import { categoryPlace } from "@/types/categoryData";
 import useMapData from "../store/useMapData";
 import usePlaceData from "../store/usePlaceData";
 import CategoryButton from "./CategoryButton";
+import { fetchPlacePhoto, fetchPlaceReview } from "../hooks/usePlaceService";
+
 import { FontAwesomeIcon } from "@fortawesome/react-fontawesome"
 import { faMagnifyingGlass, faAngleLeft, faAngleDown, faMapLocationDot } from "@fortawesome/free-solid-svg-icons"
 import Skeleton from '@mui/material/Skeleton';
@@ -18,8 +20,8 @@ const SearchForm = () => {
     const [clickedButton, setClickedButton] = useState<string>('');
 
     const { setZoomLevel, myLocation, setMapCenter, mapObject } = useMapData();
-    const { categoryPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef, setSelectedPlaceRef, listTitle, setListTitle, resetSelectedPlaceRef, resetSelectedPlace, setCategoryPlaceList } = usePlaceData();
-    const { showToatst } = useDialog();
+    const { categoryPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef, setSelectedPlaceRef, listTitle, setListTitle, resetSelectedPlaceRef, resetSelectedPlace, setCategoryPlaceList, setSelectedPlacePhoto, setSelectedPlaceReview } = usePlaceData();
+    const { showToatst, setShowPlaceInfo } = useDialog();
 
     const searchInputRef = useRef<HTMLInputElement>(null);
 
@@ -38,11 +40,21 @@ const SearchForm = () => {
         }
     };
 
-    const handleClickPlace = (place: categoryPlace) => {
+    const handleClickPlace = async (place: categoryPlace) => {
         setMapCenter({ lat: Number(place.y), lng: Number(place.x) });
         mapObject?.setCenter(new kakao.maps.LatLng(Number(place.y), Number(place.x)));
         setZoomLevel(1);
         setSelectedPlace(place);
+
+        setSelectedPlace(place);
+        
+        setShowPlaceInfo(true);
+
+        await Promise.all([
+            fetchPlacePhoto(place.id).then((photo) => setSelectedPlacePhoto(photo)),
+            fetchPlaceReview(place.id).then((review) => setSelectedPlaceReview(review))
+        ]);
+
 
         const currentWidth = window.innerWidth;
 

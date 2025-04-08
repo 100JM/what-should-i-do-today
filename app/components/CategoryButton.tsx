@@ -29,7 +29,15 @@ const CategoryButton: React.FC<CategoryButtonInterface> = ({ clickedButton, hand
                 const northEast = mapObject.getBounds().getNorthEast();
                 const rect = `${southWest.getLng()},${southWest.getLat()},${northEast.getLng()},${northEast.getLat()}`;
                 const categoryResponse = await axios.get(`api/kakao-category-api?x=${mapObject.getCenter().getLng()}&y=${mapObject.getCenter().getLat()}&category_group_code=${code}&rect=${rect}`);
-                setCategoryPlaceList(categoryResponse.data);
+                
+                if (categoryResponse.data.length > 0) {
+                    setCategoryPlaceList(categoryResponse.data);
+                } else {
+                    const noRectResponse = await axios.get(`api/kakao-category-api?x=${mapObject.getCenter().getLng()}&y=${mapObject.getCenter().getLat()}&category_group_code=${code}`);
+                    setCategoryPlaceList(noRectResponse.data);
+                }
+
+                setZoomLevel(4);
                 handleClickCateBtn(code);
                 setListTitle(`주변 ${text} 리스트`);
             }
@@ -55,6 +63,8 @@ const CategoryButton: React.FC<CategoryButtonInterface> = ({ clickedButton, hand
 
                 if (code === '명소') {
                     setZoomLevel(7);
+                } else {
+                    setZoomLevel(4);
                 }
 
             }

@@ -6,6 +6,8 @@ import useDialog from '../store/useDialog';
 import usePlaceData from '../store/usePlaceData';
 import useMapData from '../store/useMapData';
 
+import { fetchPlacePhoto, fetchPlaceReview } from '../hooks/usePlaceService';
+
 const CustomMapOverlay = () => {
     const { setShowPlaceInfo } = useDialog();
     const { setZoomLevel, setMapCenter, mapObject } = useMapData();
@@ -27,8 +29,8 @@ const CustomMapOverlay = () => {
         setShowPlaceInfo(true);
 
         await Promise.all([
-            fetchPlacePhoto(place.id),
-            fetchPlaceReview(place.id)
+            fetchPlacePhotos(place.id),
+            fetchPlaceReviews(place.id)
         ]);
 
         if (selectedPlaceRef[place.id]) {
@@ -36,19 +38,19 @@ const CustomMapOverlay = () => {
         }
     };
 
-    const fetchPlacePhoto = async (id: string) => {
+    const fetchPlacePhotos = async (id: string) => {
         try {
-            const response = await axios.get(`api/place-data-api?id=${id}&action=getPhoto`);
-            setSelectedPlacePhoto(response.data);
+            const response = await fetchPlacePhoto(id);
+            setSelectedPlacePhoto(response);
         } catch (error) {
             console.log('fetchPlacePhoto Error:', error);
         }
     };
 
-    const fetchPlaceReview = async (id: string) => {
+    const fetchPlaceReviews = async (id: string) => {
         try {
-            const response = await axios.get(`api/review-data-api?id=${id}`);
-            setSelectedPlaceReview(response.data);
+            const response = await fetchPlaceReview(id);
+            setSelectedPlaceReview(response);
         } catch (error) {
             console.log('fetchPlacePhoto Error:', error);
         }

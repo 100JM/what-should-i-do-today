@@ -7,15 +7,16 @@ import { useSession } from 'next-auth/react';
 import useMapData from '../store/useMapData';
 import usePlaceData from '../store/usePlaceData';
 import useDialog from '../store/useDialog';
+import useUserData from '../store/useUserData';
 
 import { Map, MapMarker, useKakaoLoader } from 'react-kakao-maps-sdk'
 import CustomMapOverlay from './CustomMapOverlay';
 import PlaceInfoDialog from './PlaceInfoDialog';
-import useUserData from '../store/useUserData';
+import ReSearchButton from './ReSearchButton';
 
 const KakaoMap = () => {
     const { showPlaceInfo, setShowLogin } = useDialog();
-    const { mapCenter, setMapCenter, zoomLevel, setZoomLevel, myLocation, setMyLocation, mapObject, setMapObject } = useMapData();
+    const { mapCenter, setMapCenter, zoomLevel, setZoomLevel, myLocation, setMyLocation, mapObject, setMapObject, showReSearchBtn, setShowReSearchBtn } = useMapData();
     const { setCategoryPlaceList, resetSelectedPlaceRef, setListTitle } = usePlaceData();
     const { setMyPlace } = useUserData();
     const { data: session, status } = useSession();
@@ -111,6 +112,7 @@ const KakaoMap = () => {
                     if (newZoomLevel !== zoomLevel) {
                         setZoomLevel(newZoomLevel);
                     }
+                    // setShowReSearchBtn(true);
                 }}
                 onCreate={(map) => {
                     if (!mapObject) {
@@ -138,6 +140,7 @@ const KakaoMap = () => {
                         }
                     </button>
                 }
+                {showReSearchBtn && <ReSearchButton />}
             </Map>
             {showPlaceInfo && <PlaceInfoDialog />}
         </>
