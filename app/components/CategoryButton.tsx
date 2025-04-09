@@ -12,8 +12,8 @@ interface CategoryButtonInterface {
 }
 
 const CategoryButton: React.FC<CategoryButtonInterface> = ({ clickedButton, handleClickCateBtn, searchInputRef }) => {
-    const { setCategoryPlaceList, resetSelectedPlaceRef, resetSelectedPlace, setListTitle } = usePlaceData();
-    const { mapCenter, mapObject, setZoomLevel } = useMapData();
+    const { setCategoryPlaceList, resetSelectedPlaceRef, resetSelectedPlace, setListTitle, setInitPlaceList } = usePlaceData();
+    const { mapCenter, mapObject, setZoomLevel, setShowReSearchBtn } = useMapData();
 
     const fetchCategory = async (code: string, text: string) => {
         resetSelectedPlace();
@@ -79,6 +79,9 @@ const CategoryButton: React.FC<CategoryButtonInterface> = ({ clickedButton, hand
         } else {
             fetchCategoryToKeyword(code, text);
         }
+
+        setInitPlaceList([]);
+        setShowReSearchBtn(false);
     };
 
     return (

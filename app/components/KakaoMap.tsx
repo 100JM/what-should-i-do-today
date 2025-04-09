@@ -16,8 +16,8 @@ import ReSearchButton from './ReSearchButton';
 
 const KakaoMap = () => {
     const { showPlaceInfo, setShowLogin } = useDialog();
-    const { mapCenter, setMapCenter, zoomLevel, setZoomLevel, myLocation, setMyLocation, mapObject, setMapObject, showReSearchBtn } = useMapData();
-    const { setCategoryPlaceList, resetSelectedPlaceRef, setListTitle } = usePlaceData();
+    const { mapCenter, setMapCenter, zoomLevel, setZoomLevel, myLocation, setMyLocation, mapObject, setMapObject, showReSearchBtn, setShowReSearchBtn } = useMapData();
+    const { resetSelectedPlaceRef, setListTitle, setInitPlaceList, initPlaceList } = usePlaceData();
     const { setMyPlace } = useUserData();
     const { data: session, status } = useSession();
 
@@ -32,7 +32,7 @@ const KakaoMap = () => {
         try {
             if (x && y) {
                 const categoryResponse = await axios.get(`api/kakao-category-api?x=${x}&y=${y}&&category_group_code=AT4`);
-                setCategoryPlaceList(categoryResponse.data);
+                setInitPlaceList(categoryResponse.data);
             }
         } catch (error) {
             console.log('fetchCategory Error:', error);
@@ -112,11 +112,19 @@ const KakaoMap = () => {
                     if (newZoomLevel !== zoomLevel) {
                         setZoomLevel(newZoomLevel);
                     }
-                    // setShowReSearchBtn(true);
+                    
+                    if (initPlaceList.length === 0) {
+                        setShowReSearchBtn(true);
+                    }
                 }}
                 onCreate={(map) => {
                     if (!mapObject) {
                         setMapObject(map);
+                    }
+                }}
+                onDragEnd={() => {
+                    if (initPlaceList.length === 0) {
+                        setShowReSearchBtn(true);
                     }
                 }}
             >

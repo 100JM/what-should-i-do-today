@@ -5,6 +5,8 @@ import { reviews, placePhoto } from "@/types/placeData";
 interface usePlaceDataInterface {
     categoryPlaceList: Array<categoryPlace>;
     setCategoryPlaceList: (data: Array<categoryPlace>) => void;
+    initPlaceList: Array<categoryPlace>;
+    setInitPlaceList: (data: Array<categoryPlace>) => void;
     selectedPlace: categoryPlace;
     setSelectedPlace: (place: categoryPlace) => void;
     resetSelectedPlace: () => void;
@@ -22,6 +24,8 @@ interface usePlaceDataInterface {
 const usePlaceData = create<usePlaceDataInterface>((set) => ({
     categoryPlaceList: [],
     setCategoryPlaceList: (data: Array<categoryPlace>) => set({ categoryPlaceList: data }),
+    initPlaceList: [],
+    setInitPlaceList: (data: Array<categoryPlace>) => set({ initPlaceList: data }),
     selectedPlace: {
         id: '',
         place_name: '',

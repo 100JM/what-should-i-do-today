@@ -18,9 +18,10 @@ const SearchForm = () => {
     const [showSearchForm, setShowSearchForm] = useState<boolean>(true);
     const [regionName, setRegionName] = useState<string>('');
     const [clickedButton, setClickedButton] = useState<string>('');
+    const [searchResult, setSearchResult] = useState<boolean>(true);
 
-    const { setZoomLevel, myLocation, setMapCenter, mapObject } = useMapData();
-    const { categoryPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef, setSelectedPlaceRef, listTitle, setListTitle, resetSelectedPlaceRef, resetSelectedPlace, setCategoryPlaceList, setSelectedPlacePhoto, setSelectedPlaceReview } = usePlaceData();
+    const { setZoomLevel, myLocation, setMapCenter, mapObject, setShowReSearchBtn } = useMapData();
+    const { categoryPlaceList, initPlaceList, selectedPlace, setSelectedPlace, selectedPlaceRef, setSelectedPlaceRef, listTitle, setListTitle, resetSelectedPlaceRef, resetSelectedPlace, setCategoryPlaceList, setSelectedPlacePhoto, setSelectedPlaceReview, setInitPlaceList } = usePlaceData();
     const { showToatst, setShowPlaceInfo } = useDialog();
 
     const searchInputRef = useRef<HTMLInputElement>(null);
@@ -47,7 +48,7 @@ const SearchForm = () => {
         setSelectedPlace(place);
 
         setSelectedPlace(place);
-        
+
         setShowPlaceInfo(true);
 
         await Promise.all([
@@ -78,8 +79,16 @@ const SearchForm = () => {
             if (searchInputRef.current?.value) {
 
                 const keywordResponse = await axios.get(`api/kakao-keyword-api?x=${mapObject?.getCenter().getLng()}&y=${mapObject?.getCenter().getLat()}&keyword=${searchInputRef.current.value}`);
+                
+                if (keywordResponse.data.documents.length > 0) {
+                    setCategoryPlaceList(keywordResponse.data.documents);
+                    setSearchResult(true);
+                } else {
+                    setCategoryPlaceList([]);
+                    setSearchResult(false);
+                }
 
-                setCategoryPlaceList(keywordResponse.data.documents);
+                setInitPlaceList([]);
                 setListTitle(`${searchInputRef.current.value} 검색 결과`);
 
                 if (keywordResponse.data.selected_region) {
@@ -98,6 +107,8 @@ const SearchForm = () => {
             }
         } catch (error) {
             console.log('fetchKeywordSearch Error:', error);
+        } finally {
+            setShowReSearchBtn(false);
         }
     };
 
@@ -130,7 +141,7 @@ const SearchForm = () => {
                 <div className="w-full h-full p-4 flex flex-col">
                     <div className="w-full py-1 px-2 text-xs lg:py-2 lg:px-4 lg:text-base border-2 border-[#2391ff] rounded-3xl">
                         <FontAwesomeIcon icon={faMagnifyingGlass} className="text-[#2391ff] cursor-pointer" onClick={handleSearchKeyword} />
-                        <input 
+                        <input
                             className="w-[90%] p-1 outline-none"
                             type="text"
                             placeholder="카테고리, 키워드로 검색"
@@ -158,43 +169,78 @@ const SearchForm = () => {
                             <Skeleton variant="rectangular" sx={{ borderRadius: "8px" }} height={24} />
                         }
                     </div>
-                        {categoryPlaceList.length > 0 ?
-                            <div className="mt-1 lg:mt-4 w-full custom-scroll-container flex flex-col overflow-y-auto gap-4">
-                                {categoryPlaceList.map((cp) => {
-                                    return (
-                                        <div
-                                            key={cp.id}
-                                            className={`border rounded-xl p-2 lg:p-4 cursor-pointer hover:border-[#2391ff] ${cp.id === selectedPlace.id ? 'border-[#2391ff]' : ''}`}
-                                            onClick={() => handleClickPlace(cp)}
-                                            ref={(el) => {
-                                                if (el && selectedPlaceRef[cp.id] !== el) {
-                                                    setSelectedPlaceRef(cp.id, el);
-                                                }
-                                            }}
-                                        >
-                                            <p className="text-xs mb-1 lg:mb-2 text-[#868e96]">{cp.category_name}</p>
-                                            <p className="text-sm lg:text-base">
-                                                {cp.place_name}
-                                                {cp.category_group_name && <small>({cp.category_group_name})</small>}
-                                            </p>
-                                            <p className="text-xs lg:text-sm">{cp.road_address_name ? cp.road_address_name : cp.address_name}</p>
-                                            <p className="mt-1 text-xs lg:mt-2 lg:text-sm">
-                                                <FontAwesomeIcon icon={faMapLocationDot} className="text-[#2391ff] lg:text-lg mr-2" />
-                                                현재 위치에서 {cp.distance}m
-                                            </p>
-                                        </div>
-                                    )
-                                })}
-                            </div>
-                            :
-                            <div className="mt-4 w-full overflow-y-hidden custom-scroll-container grid grid-cols-1 gap-4">
-                                {Array.from({ length: 15 }, (_, i) => {
-                                    return (
-                                        <Skeleton key={i} variant="rectangular" sx={{ borderRadius: "12px", paddingRight: "4px" }} height={120} />
-                                    )
-                                })}
-                            </div>
-                        }
+                    {categoryPlaceList.length === 0 && initPlaceList.length > 0 &&
+                        <div className="mt-1 lg:mt-4 w-full custom-scroll-container flex flex-col overflow-y-auto gap-4">
+                            {initPlaceList.map((cp) => {
+                                return (
+                                    <div
+                                        key={cp.id}
+                                        className={`border rounded-xl p-2 lg:p-4 cursor-pointer hover:border-[#2391ff] ${cp.id === selectedPlace.id ? 'border-[#2391ff]' : ''}`}
+                                        onClick={() => handleClickPlace(cp)}
+                                        ref={(el) => {
+                                            if (el && selectedPlaceRef[cp.id] !== el) {
+                                                setSelectedPlaceRef(cp.id, el);
+                                            }
+                                        }}
+                                    >
+                                        <p className="text-xs mb-1 lg:mb-2 text-[#868e96]">{cp.category_name}</p>
+                                        <p className="text-sm lg:text-base">
+                                            {cp.place_name}
+                                            {cp.category_group_name && <small>({cp.category_group_name})</small>}
+                                        </p>
+                                        <p className="text-xs lg:text-sm">{cp.road_address_name ? cp.road_address_name : cp.address_name}</p>
+                                        <p className="mt-1 text-xs lg:mt-2 lg:text-sm">
+                                            <FontAwesomeIcon icon={faMapLocationDot} className="text-[#2391ff] lg:text-lg mr-2" />
+                                            현재 위치에서 {cp.distance}m
+                                        </p>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    }
+                    {categoryPlaceList.length === 0 && initPlaceList.length === 0 && searchResult &&
+                        <div className="mt-4 w-full overflow-y-hidden custom-scroll-container grid grid-cols-1 gap-4">
+                            {Array.from({ length: 15 }, (_, i) => {
+                                return (
+                                    <Skeleton key={i} variant="rectangular" sx={{ borderRadius: "12px", paddingRight: "4px" }} height={120} />
+                                )
+                            })}
+                        </div>
+                    }
+                    {!searchResult &&
+                        <div className="w-full h-full flex justify-center items-center">
+                            <span>검색 결과가 없습니다.</span>
+                        </div>
+                    }
+                    {categoryPlaceList.length > 0 &&
+                        <div className="mt-1 lg:mt-4 w-full custom-scroll-container flex flex-col overflow-y-auto gap-4">
+                            {categoryPlaceList.map((cp) => {
+                                return (
+                                    <div
+                                        key={cp.id}
+                                        className={`border rounded-xl p-2 lg:p-4 cursor-pointer hover:border-[#2391ff] ${cp.id === selectedPlace.id ? 'border-[#2391ff]' : ''}`}
+                                        onClick={() => handleClickPlace(cp)}
+                                        ref={(el) => {
+                                            if (el && selectedPlaceRef[cp.id] !== el) {
+                                                setSelectedPlaceRef(cp.id, el);
+                                            }
+                                        }}
+                                    >
+                                        <p className="text-xs mb-1 lg:mb-2 text-[#868e96]">{cp.category_name}</p>
+                                        <p className="text-sm lg:text-base">
+                                            {cp.place_name}
+                                            {cp.category_group_name && <small>({cp.category_group_name})</small>}
+                                        </p>
+                                        <p className="text-xs lg:text-sm">{cp.road_address_name ? cp.road_address_name : cp.address_name}</p>
+                                        <p className="mt-1 text-xs lg:mt-2 lg:text-sm">
+                                            <FontAwesomeIcon icon={faMapLocationDot} className="text-[#2391ff] lg:text-lg mr-2" />
+                                            현재 위치에서 {cp.distance}m
+                                        </p>
+                                    </div>
+                                )
+                            })}
+                        </div>
+                    }
                 </div>
             </div>
         </>
